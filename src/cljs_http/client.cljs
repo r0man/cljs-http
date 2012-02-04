@@ -25,60 +25,6 @@
 (def unexceptional-status?
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
-;; (defn wrap-exceptions [client]
-;;   (fn [req]
-;;     (let [{:keys [status] :as resp} (client req)]
-;;       (if (or (not (clojure.core/get req :throw-exceptions true))
-;;               (unexceptional-status? status))
-;;         resp
-;;         (throw (js/Error. (str status)))))))
-
-;; (defn follow-redirect [client req resp]
-;;   (let [url (get-in resp [:headers "location"])]
-;;     (client (merge req (parse-url url)))))
-
-;; (defn wrap-redirects [client]
-;;   (fn [{:keys [request-method] :as req}]
-;;     (let [{:keys [status] :as resp} (client req)]
-;;       (cond
-;;        (and (#{301 302 307} status) (#{:get :head} request-method))
-;;        (follow-redirect client req resp)
-;;        (and (= 303 status) (= :head request-method))
-;;        (follow-redirect client (assoc req :request-method :get) resp)
-;;        :else
-;;        resp))))
-
-;; (defn content-type-value [type]
-;;   (if (keyword? type)
-;;     (str "application/" (name type))
-;;     type))
-
-;; (defn wrap-content-type [client]
-;;   (fn [{:keys [content-type] :as req}]
-;;     (if content-type
-;;       (client (-> req (assoc :content-type
-;;                         (content-type-value content-type))))
-;;       (client req))))
-
-;; (defn wrap-accept [client]
-;;   (fn [{:keys [accept] :as req}]
-;;     (if accept
-;;       (client (-> req (dissoc :accept)
-;;                   (assoc-in [:headers "Accept"]
-;;                             (content-type-value accept))))
-;;       (client req))))
-
-;; (defn accept-encoding-value [accept-encoding]
-;;   (join ", " (map name accept-encoding)))
-
-;; (defn wrap-accept-encoding [client]
-;;   (fn [{:keys [accept-encoding] :as req}]
-;;     (if accept-encoding
-;;       (client (-> req (dissoc :accept-encoding)
-;;                   (assoc-in [:headers "Accept-Encoding"]
-;;                             (accept-encoding-value accept-encoding))))
-;;       (client req))))
-
 (defn generate-query-string [params]
   (join "&" (map (fn [[k v]] (str (util/url-encode (name k)) "=" (util/url-encode (str v)))) params)))
 
@@ -90,7 +36,7 @@
                     (generate-query-string query-params))))
       (client req))))
 
-(defn wrap-cors-bugfix-android [client]
+(defn wrap-android-cors-bugfix [client]
   (fn [request]
     (client
      (if (android?)
@@ -172,7 +118,7 @@
   [request]
   (-> request
       wrap-query-params
-      wrap-cors-bugfix-android
+      wrap-android-cors-bugfix
       wrap-json-response
       wrap-js->clj
       wrap-deserialization
@@ -228,12 +174,3 @@
   "Like #'request, but sets the :method and :url as appropriate."
   [url on-success & [on-error & {:as options}]]
   (request (merge options {:method :delete :on-error on-error :on-success on-success :url url})))
-
-;; (get "http://api.burningswell.dev/continents"
-;;      (fn [response]
-;;        (.log js/console (str "SUCCESS: " (:status response)))
-;;        ;; (.log js/console (:body response))
-;;        (.log js/console (:name (first (:body response)))))
-;;      (fn [response]
-;;        (.log js/console (str "ERROR: " (:status response)))
-;;        (.log js/console response)))
