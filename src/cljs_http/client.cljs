@@ -44,60 +44,60 @@
        request))))
 
 (defn wrap-json-response [client]
-  (fn [{:keys [complete-fn] :as req}]
+  (fn [{:keys [on-complete] :as req}]
     (client
      (assoc req
-       :complete-fn
+       :on-complete
        (fn [{:keys [body] :as response}]
-         (if complete-fn
-           (complete-fn
+         (if on-complete
+           (on-complete
             (if-not (blank? body)
               (assoc response :body (json/parse body))
               response))))))))
 
 (defn wrap-js->clj [client]
-  (fn [{:keys [complete-fn] :as req}]
+  (fn [{:keys [on-complete] :as req}]
     (client
      (assoc req
-       :complete-fn
+       :on-complete
        (fn [{:keys [body] :as response}]
-         (if complete-fn
-           (complete-fn
+         (if on-complete
+           (on-complete
             (if body
               (assoc response :body (js->clj body :keywordize-keys true))
               response))))))))
 
 (defn wrap-deserialization [client]
-  (fn [{:keys [complete-fn deserialize] :as req}]
+  (fn [{:keys [on-complete deserialize] :as req}]
     (client
      (assoc req
-       :complete-fn
+       :on-complete
        (fn [{:keys [body] :as response}]
-         (if complete-fn
-           (complete-fn
+         (if on-complete
+           (on-complete
             (if deserialize
               (assoc response :body (deserialize body))
               response))))))))
 
 (defn wrap-on-success [client]
-  (fn [{:keys [on-success complete-fn] :as req}]
+  (fn [{:keys [on-success on-complete] :as req}]
     (client
      (assoc req
-       :complete-fn
+       :on-complete
        (fn [response]
          (if (and on-success (unexceptional-status? (:status response)))
            (on-success response)
-           (if complete-fn (complete-fn response))))))))
+           (if on-complete (on-complete response))))))))
 
 (defn wrap-on-error [client]
-  (fn [{:keys [on-error complete-fn] :as req}]
+  (fn [{:keys [on-error on-complete] :as req}]
     (client
      (assoc req
-       :complete-fn
+       :on-complete
        (fn [response]
          (if (and on-error (not (unexceptional-status? (:status response))))
            (on-error response)
-           (if complete-fn (complete-fn response))))))))
+           (if on-complete (on-complete response))))))))
 
 (defn wrap-method [client]
   (fn [req]
