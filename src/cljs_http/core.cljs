@@ -32,7 +32,7 @@
             :headers (or (. xhr (getAllResponseHeaders)) {})})
           (catch js/Error e
             (.log js/console e)
-            (.log js/console (.stack e)))
+            (.log js/console (. e -stack)))
           (finally
            (. xhr (dispose))))))
     (. xhr (send url (name (or request-method :get))))))
