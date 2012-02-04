@@ -4,5 +4,5 @@
   :dev-dependencies [[lein-cljsbuild "0.0.11"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild [{:source-path "src"
-               :compiler {:output-to "cljs-http.js"
-                          :optimizations :advanced}}])
+               :compiler {:optimizations :advanced
+                          :pretty-print false}}])

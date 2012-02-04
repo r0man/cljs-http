@@ -7,3 +7,4 @@
 /checkouts
 /.lein-deps-sum
 /.clojurescript-output
+/main.js

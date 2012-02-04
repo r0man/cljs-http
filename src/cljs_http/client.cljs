@@ -133,24 +133,24 @@
               (assoc response :body (deserialize body))
               response))))))))
 
-(defn wrap-success-fn [client]
-  (fn [{:keys [success-fn complete-fn] :as req}]
+(defn wrap-on-success [client]
+  (fn [{:keys [on-success complete-fn] :as req}]
     (client
      (assoc req
        :complete-fn
        (fn [response]
-         (if (and success-fn (unexceptional-status? (:status response)))
-           (success-fn response)
+         (if (and on-success (unexceptional-status? (:status response)))
+           (on-success response)
            (if complete-fn (complete-fn response))))))))
 
-(defn wrap-error-fn [client]
-  (fn [{:keys [error-fn complete-fn] :as req}]
+(defn wrap-on-error [client]
+  (fn [{:keys [on-error complete-fn] :as req}]
     (client
      (assoc req
        :complete-fn
        (fn [response]
-         (if (and error-fn (not (unexceptional-status? (:status response))))
-           (error-fn response)
+         (if (and on-error (not (unexceptional-status? (:status response))))
+           (on-error response)
            (if complete-fn (complete-fn response))))))))
 
 (defn wrap-method [client]
@@ -176,8 +176,8 @@
       wrap-json-response
       wrap-js->clj
       wrap-deserialization
-      wrap-success-fn
-      wrap-error-fn
+      wrap-on-success
+      wrap-on-error
       wrap-method
       wrap-url))
 
@@ -206,28 +206,28 @@
 
 (defn get
   "Like #'request, but sets the :method and :url as appropriate."
-  [url success-fn & [error-fn & {:as options}]]
-  (request (merge options {:method :get :error-fn error-fn :success-fn success-fn :url url})))
+  [url on-success & [on-error & {:as options}]]
+  (request (merge options {:method :get :on-error on-error :on-success on-success :url url})))
 
 (defn head
   "Like #'request, but sets the :method and :url as appropriate."
-  [url success-fn & [error-fn & {:as options}]]
-  (request (merge options {:method :head :error-fn error-fn :success-fn success-fn :url url})))
+  [url on-success & [on-error & {:as options}]]
+  (request (merge options {:method :head :on-error on-error :on-success on-success :url url})))
 
 (defn post
   "Like #'request, but sets the :method and :url as appropriate."
-  [url success-fn & [error-fn & {:as options}]]
-  (request (merge options {:method :post :error-fn error-fn :success-fn success-fn :url url})))
+  [url on-success & [on-error & {:as options}]]
+  (request (merge options {:method :post :on-error on-error :on-success on-success :url url})))
 
 (defn put
   "Like #'request, but sets the :method and :url as appropriate."
-  [url success-fn & [error-fn & {:as options}]]
-  (request (merge options {:method :put :error-fn error-fn :success-fn success-fn :url url})))
+  [url on-success & [on-error & {:as options}]]
+  (request (merge options {:method :put :on-error on-error :on-success on-success :url url})))
 
 (defn delete
   "Like #'request, but sets the :method and :url as appropriate."
-  [url success-fn & [error-fn & {:as options}]]
-  (request (merge options {:method :delete :error-fn error-fn :success-fn success-fn :url url})))
+  [url on-success & [on-error & {:as options}]]
+  (request (merge options {:method :delete :on-error on-error :on-success on-success :url url})))
 
 ;; (get "http://api.burningswell.dev/continents"
 ;;      (fn [response]
