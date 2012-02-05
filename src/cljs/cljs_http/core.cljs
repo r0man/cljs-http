@@ -5,6 +5,16 @@
             [goog.net.XhrIo :as XhrIo]
             [goog.structs.Map :as Map]))
 
+(defn build-url
+  "Build the url from the request map."
+  [{:keys [scheme server-name server-port uri query-string]}]
+  (str (doto (goog.Uri.)
+         (. (setScheme scheme))
+         (. (setDomain server-name))
+         (. (setPort server-port))
+         (. (setPath uri))
+         (. (setQuery query-string)))))
+
 (defn request
   "Executes the HTTP request corresponding to the given Ring request
    map and calls the on-complete fn with the Ring response map
@@ -15,13 +25,8 @@
    bodies."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body on-complete] :as request}]
-  (let [xhr (goog.net.XhrIo.)
-        url (str (doto (goog.Uri.)
-                   (. (setScheme scheme))
-                   (. (setDomain server-name))
-                   (. (setPort server-port))
-                   (. (setPath uri))
-                   (. (setQuery query-string))))]
+  (let [xhr (goog.net.XhrIo.)]
+    (.setWithCredentials xhr true)
     (if on-complete
       (events/listen
        xhr goog.net.EventType.COMPLETE
@@ -35,4 +40,4 @@
             (.log js/console (. e -stack)))
           (finally
            (. xhr (dispose))))))
-    (. xhr (send url (name (or request-method :get))))))
+    (. xhr (send (build-url request) (name (or request-method :get))))))
