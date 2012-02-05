@@ -7,11 +7,11 @@
 
 (defn request
   "Executes the HTTP request corresponding to the given Ring request
-   map and calls the on-complete with the Ring response map
+   map and calls the on-complete fn with the Ring response map
    corresponding to the resulting HTTP response.
 
    Note that where Ring uses InputStreams for the request and response
-   bodies, the cljs-http library uses JavaScript Strings for the
+   bodies, the cljs-http library uses JavaScript strings for the
    bodies."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body on-complete] :as request}]
