@@ -8,3 +8,8 @@
 /.lein-deps-sum
 /.clojurescript-output
 /main.js
+/.lein-cljsbuild-compiler-*
+/.lein-cljsbuild-repl
+/.lein-plugins/checksum
+/resources/public/javascripts/cljs-http-dev.js
+/resources/public/javascripts/cljs-http.js
