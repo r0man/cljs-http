@@ -7,13 +7,16 @@
             [goog.userAgent :as user-agent])
   (:use [clojure.string :only (blank? join)]))
 
-(defn android? []
-  (re-matches #"(?i).*android.*" (user-agent/getUserAgentString)))
+(defn android?
+  "Returns true if the user agent is an Android client."
+  [] (re-matches #"(?i).*android.*" (user-agent/getUserAgentString)))
 
 (defn if-pos [v]
   (if (and v (pos? v)) v))
 
-(defn parse-url [url]
+(defn parse-url
+  "Parse `url` into a hash map."
+  [url]
   (let [uri (uri/parse url)]
     {:scheme (. uri (getScheme))
      :server-name (. uri (getDomain))

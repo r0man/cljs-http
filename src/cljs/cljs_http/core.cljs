@@ -40,4 +40,6 @@
             (.log js/console (. e -stack)))
           (finally
            (. xhr (dispose))))))
-    (. xhr (send (build-url request) (name (or request-method :get))))))
+    (. xhr (send (build-url request)
+                 (name (or request-method :get))
+                 body))))
