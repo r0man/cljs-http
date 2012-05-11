@@ -13,6 +13,6 @@
               :repl-launch-commands
               {"chromium" ["chromium" "test-resources/index.html"]
                "firefox" ["firefox" "test-resources/index.html"]}}
-  :plugins [[lein-cljsbuild "0.1.2"]]
+  :plugins [[lein-cljsbuild "0.1.9"]]
   :hooks [leiningen.cljsbuild]
   :source-path "src/clj")
