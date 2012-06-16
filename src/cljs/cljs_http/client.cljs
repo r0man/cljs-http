@@ -3,13 +3,8 @@
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
             [goog.json :as json]
-            [goog.Uri :as uri]
-            [goog.userAgent :as user-agent])
+            [goog.Uri :as uri])
   (:use [clojure.string :only (blank? join)]))
-
-(defn android?
-  "Returns true if the user agent is an Android client."
-  [] (re-matches #"(?i).*android.*" (user-agent/getUserAgentString)))
 
 (defn if-pos [v]
   (if (and v (pos? v)) v))
@@ -42,7 +37,7 @@
 (defn wrap-android-cors-bugfix [client]
   (fn [request]
     (client
-     (if (android?)
+     (if (util/android?)
        (assoc-in request [:query-params :android] (Math/random))
        request))))
 
