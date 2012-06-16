@@ -5,20 +5,16 @@
 <!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js">   <!--<![endif]-->
   <head>
+    <title>Cljs-Http REPL</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>cljs-http repl</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
   </head>
   <body>
     <div id="content">
-      <script type="text/javascript">
-        var CLOSURE_NO_DEPS = true;
-      </script>
-      <script type="text/javascript" src="../classes/cljs-http-dev.js"></script>
-      <script type="text/javascript">
-        cljs_http.repl.repl_connect();
-      </script>
+      <script type="text/javascript">var CLOSURE_NO_DEPS = true;</script>
+      <script type="text/javascript" src="../target/cljs-http-debug.js"></script>
+      <script type="text/javascript">cljs_http.repl.connect();</script>
   </body>
 </html>

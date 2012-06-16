@@ -13,3 +13,4 @@
 /.lein-plugins/checksum
 /resources/public/javascripts/cljs-http-dev.js
 /resources/public/javascripts/cljs-http.js
+/target
