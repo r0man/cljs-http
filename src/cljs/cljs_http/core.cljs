@@ -25,6 +25,10 @@
    bodies."
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body on-complete] :as request}]
+  (prn request-method)
+  (prn server-name)
+  (prn server-port)
+  (prn uri)
   (let [xhr (goog.net.XhrIo.)]
     (.setWithCredentials xhr true)
     (if on-complete
