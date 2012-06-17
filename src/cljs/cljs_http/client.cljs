@@ -145,30 +145,46 @@
    * Gzip and deflate responses are accepted and decompressed
    * Input and output bodies are coerced as required and indicated by the :as
      option."}
-  request
-  (wrap-request core/request))
-
-(defn get
-  "Like #'request, but sets the :method and :url as appropriate."
-  [url on-success & [on-error & {:as options}]]
-  (request (merge options {:method :get :on-error on-error :on-success on-success :url url})))
-
-(defn head
-  "Like #'request, but sets the :method and :url as appropriate."
-  [url on-success & [on-error & {:as options}]]
-  (request (merge options {:method :head :on-error on-error :on-success on-success :url url})))
-
-(defn post
-  "Like #'request, but sets the :method and :url as appropriate."
-  [url on-success & [on-error & {:as options}]]
-  (request (merge options {:method :post :on-error on-error :on-success on-success :url url})))
-
-(defn put
-  "Like #'request, but sets the :method and :url as appropriate."
-  [url on-success & [on-error & {:as options}]]
-  (request (merge options {:method :put :on-error on-error :on-success on-success :url url})))
+  request (wrap-request core/request))
 
 (defn delete
   "Like #'request, but sets the :method and :url as appropriate."
-  [url on-success & [on-error & {:as options}]]
-  (request (merge options {:method :delete :on-error on-error :on-success on-success :url url})))
+  [url & [req]]
+  (request (merge req {:method :delete :url url})))
+
+(defn get
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :get :url url})))
+
+(defn head
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :head :url url})))
+
+(defn move
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :move :url url})))
+
+(defn options
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :options :url url})))
+
+(defn patch
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :patch :url url})))
+
+(defn post
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :post :url url})))
+
+(defn put
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :put :url url})))
+
+;; (get "http://api.burningswell.dev/continents" {})
