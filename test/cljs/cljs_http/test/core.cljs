@@ -1,5 +1,5 @@
 (ns cljs-http.test.core
-  (:use [cljs-http.core :only (build-url)]))
+  (:use [cljs-http.core :only [build-url]]))
 
 (defn test-build-url []
   (build-url {:scheme :https

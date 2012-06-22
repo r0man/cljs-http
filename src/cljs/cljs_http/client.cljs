@@ -4,7 +4,7 @@
             [cljs-http.util :as util]
             [goog.json :as json]
             [goog.Uri :as uri])
-  (:use [clojure.string :only (blank? join)]))
+  (:use [clojure.string :only [blank? join]]))
 
 (defn if-pos [v]
   (if (and v (pos? v)) v))

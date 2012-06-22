@@ -1,5 +1,5 @@
 (ns cljs-http.test.util
-  (:use [cljs-http.util :only (android? url-encode user-agent)]))
+  (:use [cljs-http.util :only [android? url-encode user-agent]]))
 
 (defn test-android? []
   (android?))

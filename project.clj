@@ -1,6 +1,7 @@
 (defproject cljs-http/cljs-http "0.0.2-SNAPSHOT"
   :description "A ClojureScript HTTP library."
-  :dependencies [[org.clojure/clojure "1.4.0"]]
+  :dependencies [[org.clojure/clojure "1.4.0"]
+                 [org.clojure/clojurescript "0.0-1424"]]
   :plugins [[lein-cljsbuild "0.2.1"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds [{:source-path "src/cljs"
