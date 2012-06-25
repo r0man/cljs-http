@@ -4,6 +4,7 @@
                  [org.clojure/clojurescript "0.0-1424"]]
   :plugins [[lein-cljsbuild "0.2.1"]]
   :hooks [leiningen.cljsbuild]
+  :min-lein-version "2.0.0"
   :cljsbuild {:builds [{:compiler {:output-to "target/cljs-http-debug.js"}
                         :source-path "src/cljs"}
                        {:compiler {:output-to "target/cljs-http.js"
@@ -20,4 +21,4 @@
               {"chromium" ["chromium" "http://localhost:9000/"]
                "firefox" ["firefox" "http://localhost:9000/"]}
               :test-commands {"unit" ["./test-cljs.sh"]}}
-  :source-path "src/clj")
+  :source-paths ["src/clj"])
