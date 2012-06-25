@@ -3,8 +3,9 @@
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
             [goog.json :as json]
-            [goog.Uri :as uri])
-  (:use [clojure.string :only [blank? join]]))
+            [goog.Uri :as uri]
+            [clojure.string :refer [blank? join]]
+            [cljs.reader :refer [read-string]]))
 
 (defn if-pos [v]
   (if (and v (pos? v)) v))
@@ -41,15 +42,29 @@
        (assoc-in request [:query-params :android] (Math/random))
        request))))
 
+(defn wrap-clojure-response [client]
+  (fn [{:keys [on-complete] :as req}]
+    (client
+     (assoc req
+       :on-complete
+       (fn [{:keys [body headers] :as response}]
+         (if on-complete
+           (on-complete
+            (if (and (not (blank? body))
+                     (re-find #"(?i)application/clojure" (clojure.core/get headers "content-type" "")))
+              (assoc response :body (read-string body))
+              response))))))))
+
 (defn wrap-json-response [client]
   (fn [{:keys [on-complete] :as req}]
     (client
      (assoc req
        :on-complete
-       (fn [{:keys [body] :as response}]
+       (fn [{:keys [body headers] :as response}]
          (if on-complete
            (on-complete
-            (if-not (blank? body)
+            (if (and (not (blank? body))
+                     (re-find #"(?i)application/json" (clojure.core/get headers "content-type" "")))
               (assoc response :body (json/parse body))
               response))))))))
 
@@ -117,6 +132,7 @@
   (-> request
       wrap-query-params
       wrap-android-cors-bugfix
+      wrap-clojure-response
       wrap-json-response
       wrap-js->clj
       wrap-deserialization
@@ -187,4 +203,18 @@
   [url & [req]]
   (request (merge req {:method :put :url url})))
 
-;; (get "http://api.burningswell.dev/continents" {})
+(comment
+  (get "http://api.burningswell.dev/continents" {})
+  (request
+   {:url "http://api.burningswell.dev/continents"
+    :method :get
+    :headers {"Accept" "application/clojure"}
+    :on-success
+    (fn [response]
+      (.log js/console (str "SUCCESS: " (:status response)))
+      ;; (.log js/console (:body response))
+      (.log js/console (first (:body response))))
+    :on-error
+    (fn [response]
+      (.log js/console (str "ERROR: " (:status response)))
+      (.log js/console response))}))

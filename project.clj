@@ -4,16 +4,16 @@
                  [org.clojure/clojurescript "0.0-1424"]]
   :plugins [[lein-cljsbuild "0.2.1"]]
   :hooks [leiningen.cljsbuild]
-  :cljsbuild {:builds [{:source-path "src/cljs"
-                        :compiler {:output-to "target/cljs-http-debug.js"}}
+  :cljsbuild {:builds [{:compiler {:output-to "target/cljs-http-debug.js"}
+                        :source-path "src/cljs"}
                        {:compiler {:output-to "target/cljs-http.js"
                                    :optimizations :advanced
                                    :pretty-print false}
-                        :source-path "src/cljs"}
+                        :source-path "src/cljs"
+                        :jar true}
                        {:compiler {:output-to "target/cljs-http-test.js"
                                    :optimizations :advanced
                                    :pretty-print true}
-                        :jar true
                         :source-path "test/cljs"}]
               :repl-listen-port 9000
               :repl-launch-commands

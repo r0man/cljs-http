@@ -1,5 +1,6 @@
 (ns cljs-http.core
-  (:require [goog.events :as events]
+  (:require [cljs-http.util :as util]
+            [goog.events :as events]
             [goog.Uri :as Uri]
             [goog.net.EventType :as EventType]
             [goog.net.XhrIo :as XhrIo]
@@ -26,7 +27,9 @@
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body on-complete] :as request}]
   (let [xhr (goog.net.XhrIo.)]
-    (.setWithCredentials xhr true)
+    ;; (.setWithCredentials xhr true)
+    (doseq [[k v] headers]
+      (.set (. xhr -headers) k v))
     (if on-complete
       (events/listen
        xhr goog.net.EventType.COMPLETE
@@ -34,7 +37,7 @@
           (on-complete
            {:status (. xhr (getStatus))
             :body (. xhr (getResponseText))
-            :headers (or (. xhr (getAllResponseHeaders)) {})})
+            :headers (util/parse-headers (. xhr (getAllResponseHeaders)))})
           (catch js/Error e
             (.log js/console e)
             (.log js/console (. e -stack)))
