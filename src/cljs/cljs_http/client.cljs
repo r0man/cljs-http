@@ -13,13 +13,16 @@
 (defn parse-url
   "Parse `url` into a hash map."
   [url]
-  (let [uri (uri/parse url)]
-    {:scheme (. uri (getScheme))
+  (let [uri (uri/parse url)
+        query-data (. uri (getQueryData))]
+    {:scheme (keyword (. uri (getScheme)))
      :server-name (. uri (getDomain))
      :server-port (if-pos (. uri (getPort)))
      :uri (. uri (getPath))
-     :query-data (. uri (getQueryData))
-     :query-string (str (. uri (getQueryData)))}))
+     :query-data (if-not (. query-data (isEmpty))
+                   query-data)
+     :query-string (if-not (. query-data (isEmpty))
+                     (str query-data))}))
 
 (def unexceptional-status?
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
