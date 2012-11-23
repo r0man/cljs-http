@@ -7,4 +7,5 @@
   (client/test)
   (core/test)
   (util/test)
-  "All tests passed.")
+  "All tests passed."
+  1)

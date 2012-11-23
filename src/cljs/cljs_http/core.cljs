@@ -10,7 +10,7 @@
   "Build the url from the request map."
   [{:keys [scheme server-name server-port uri query-string]}]
   (str (doto (goog.Uri.)
-         (. (setScheme scheme))
+         (. (setScheme (name scheme)))
          (. (setDomain server-name))
          (. (setPort server-port))
          (. (setPath uri))
@@ -27,7 +27,8 @@
   [{:keys [request-method scheme server-name server-port uri query-string
            headers content-type character-encoding body on-complete] :as request}]
   (let [xhr (goog.net.XhrIo.)]
-    ;; (.setWithCredentials xhr true)
+    (.setWithCredentials xhr true)
+    (.log js/console (build-url request))
     (doseq [[k v] headers]
       (.set (. xhr -headers) k v))
     (if on-complete
