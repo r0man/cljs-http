@@ -15,3 +15,5 @@
 /resources/public/javascripts/cljs-http.js
 /target
 /out
+/.lein-repl-history
+/repl

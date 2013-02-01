@@ -1,6 +1,17 @@
 (ns cljs-http.util
-  (:require [goog.userAgent :as agent]
-            [clojure.string :refer [split lower-case]]))
+  (:require [clojure.string :refer [split lower-case]]
+            [goog.userAgent :as agent]
+            [goog.Uri :as Uri]))
+
+(defn build-url
+  "Build the url from the request map."
+  [{:keys [scheme server-name server-port uri query-string]}]
+  (str (doto (goog.Uri.)
+         (. (setScheme (name scheme)))
+         (. (setDomain server-name))
+         (. (setPort server-port))
+         (. (setPath uri))
+         (. (setQuery query-string)))))
 
 (defn user-agent
   "Returns the user agent."

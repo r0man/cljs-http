@@ -1,11 +1,25 @@
 (ns cljs-http.client
-  (:refer-clojure :exclude (get))
+  (:refer-clojure :exclude [get])
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
-            [goog.json :as json]
+            [cljs.reader :refer [read-string]]
+            [clojure.string :refer [join]]
             [goog.Uri :as uri]
-            [clojure.string :refer [blank? join]]
-            [cljs.reader :refer [read-string]]))
+            [goog.json :as json]
+            [goog.labs.async.SimpleResult :as SimpleResult]
+            [goog.labs.async.wait :as wait]))
+
+(defn wait
+  "Calls the handler on resolution of the result (success or failure)"
+  [result handler] (wait/wait result handler))
+
+(defn on-error
+  "Calls the handler if the result action errors."
+  [result handler] (wait/onError result handler))
+
+(defn on-success
+  "Calls the handler if the result succeeds."
+  [result handler] (wait/onSuccess result handler))
 
 (defn if-pos [v]
   (if (and v (pos? v)) v))
@@ -30,6 +44,51 @@
 (defn generate-query-string [params]
   (join "&" (map (fn [[k v]] (str (util/url-encode (name k)) "=" (util/url-encode (str v)))) params)))
 
+(defn- parse-xhr [xhr]
+  {:body (.-response xhr)
+   :headers (util/parse-headers (.getAllResponseHeaders xhr))
+   :status (.-status xhr)})
+
+(defn wrap-response
+  "Wrap the XMLHttpRequest of `client` into a Ring response map."
+  [client]
+  (fn [request]
+    (let [result (goog.labs.async.SimpleResult.)]
+      (doto (client request)
+        (on-success #(.setValue result (parse-xhr %1)))
+        (on-error #(.setError result (parse-xhr %1))))
+      result)))
+
+(defn decode-body
+  "Decocde the :body of `response` with `decode-fn` if the content type matches."
+  [response decode-fn content-type]
+  (if (re-find (re-pattern (format "(?i)%s" content-type))
+               (str (clojure.core/get (:headers response) "content-type" "")))
+    (update-in response [:body] decode-fn)
+    response))
+
+(defn wrap-clojure-response
+  "Decode application/clojure responses."
+  [client]
+  (fn [request]
+    (let [result (goog.labs.async.SimpleResult.)
+          decode #(decode-body %1 read-string "application/clojure")]
+      (doto (client request)
+        (on-success #(.setValue result (decode %1)))
+        (on-error #(.setError result (decode %1))))
+      result)))
+
+(defn wrap-json-response
+  "Decode application/json responses."
+  [client]
+  (fn [request]
+    (let [result (goog.labs.async.SimpleResult.)
+          decode #(decode-body %1 json/parse "application/json")]
+      (doto (client request)
+        (on-success #(.setValue result (decode %1)))
+        (on-error #(.setError result (decode %1))))
+      result)))
+
 (defn wrap-query-params [client]
   (fn [{:keys [query-params] :as req}]
     (if query-params
@@ -44,76 +103,6 @@
      (if (util/android?)
        (assoc-in request [:query-params :android] (Math/random))
        request))))
-
-(defn wrap-clojure-response [client]
-  (fn [{:keys [on-complete] :as req}]
-    (client
-     (assoc req
-       :on-complete
-       (fn [{:keys [body headers] :as response}]
-         (if on-complete
-           (on-complete
-            (if (and (not (blank? body))
-                     (re-find #"(?i)application/clojure" (clojure.core/get headers "content-type" "")))
-              (assoc response :body (read-string body))
-              response))))))))
-
-(defn wrap-json-response [client]
-  (fn [{:keys [on-complete] :as req}]
-    (client
-     (assoc req
-       :on-complete
-       (fn [{:keys [body headers] :as response}]
-         (if on-complete
-           (on-complete
-            (if (and (not (blank? body))
-                     (re-find #"(?i)application/json" (clojure.core/get headers "content-type" "")))
-              (assoc response :body (json/parse body))
-              response))))))))
-
-(defn wrap-js->clj [client]
-  (fn [{:keys [on-complete] :as req}]
-    (client
-     (assoc req
-       :on-complete
-       (fn [{:keys [body] :as response}]
-         (if on-complete
-           (on-complete
-            (if body
-              (assoc response :body (js->clj body :keywordize-keys true))
-              response))))))))
-
-(defn wrap-deserialization [client]
-  (fn [{:keys [on-complete deserialize] :as req}]
-    (client
-     (assoc req
-       :on-complete
-       (fn [{:keys [body] :as response}]
-         (if on-complete
-           (on-complete
-            (if deserialize
-              (assoc response :body (deserialize body))
-              response))))))))
-
-(defn wrap-on-success [client]
-  (fn [{:keys [on-success on-complete] :as req}]
-    (client
-     (assoc req
-       :on-complete
-       (fn [response]
-         (if (and on-success (unexceptional-status? (:status response)))
-           (on-success response)
-           (if on-complete (on-complete response))))))))
-
-(defn wrap-on-error [client]
-  (fn [{:keys [on-error on-complete] :as req}]
-    (client
-     (assoc req
-       :on-complete
-       (fn [response]
-         (if (and on-error (not (unexceptional-status? (:status response))))
-           (on-error response)
-           (if on-complete (on-complete response))))))))
 
 (defn wrap-method [client]
   (fn [req]
@@ -133,14 +122,11 @@
    core client. See client/client."
   [request]
   (-> request
-      wrap-query-params
-      wrap-android-cors-bugfix
+      wrap-response
       wrap-clojure-response
       wrap-json-response
-      wrap-js->clj
-      wrap-deserialization
-      wrap-on-success
-      wrap-on-error
+      wrap-query-params
+      wrap-android-cors-bugfix
       wrap-method
       wrap-url))
 
@@ -152,18 +138,7 @@
    recognized:
    * :url
    * :method
-   * :query-params
-   * :basic-auth
-   * :content-type
-   * :accept
-   * :accept-encoding
-   * :as
-
-  The following additional behaviors over also automatically enabled:
-   * Exceptions are thrown for status codes other than 200-207, 300-303, or 307
-   * Gzip and deflate responses are accepted and decompressed
-   * Input and output bodies are coerced as required and indicated by the :as
-     option."}
+   * :query-params"}
   request (wrap-request core/request))
 
 (defn delete
@@ -207,17 +182,15 @@
   (request (merge req {:method :put :url url})))
 
 (comment
-  (get "http://api.burningswell.dev/continents" {})
-  (request
-   {:url "http://api.burningswell.dev/continents"
-    :method :get
-    :headers {"Accept" "application/clojure"}
-    :on-success
-    (fn [response]
-      (.log js/console (str "SUCCESS: " (:status response)))
-      ;; (.log js/console (:body response))
-      (.log js/console (first (:body response))))
-    :on-error
-    (fn [response]
-      (.log js/console (str "ERROR: " (:status response)))
-      (.log js/console response))}))
+
+  (doto (get "http://api.burningswell.dev/continents" {:headers {"Accept" "application/clojure"}})
+    (on-success
+     (fn [resp]
+       (.log js/console "on-success")
+       (println (:body resp))))
+
+    (on-error
+     (fn [resp]
+       (.log js/console "on-error")
+       (println resp))))
+  )
