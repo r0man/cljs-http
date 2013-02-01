@@ -49,6 +49,10 @@
    :headers (util/parse-headers (.getAllResponseHeaders xhr))
    :status (.-status xhr)})
 
+(defn wrap-credentials [client credentials?]
+  (fn [request]
+    (client (assoc request :credentials credentials?))))
+
 (defn wrap-response
   "Wrap the XMLHttpRequest of `client` into a Ring response map."
   [client]
