@@ -15,7 +15,7 @@
 
 (defn on-error
   "Calls the handler if the result action errors."
-  [result handler] (wait/onError result handler))
+  [result handler] (wait/onError result #(handler (.getError %1))))
 
 (defn on-success
   "Calls the handler if the result succeeds."
@@ -44,14 +44,17 @@
 (defn generate-query-string [params]
   (join "&" (map (fn [[k v]] (str (util/url-encode (name k)) "=" (util/url-encode (str v)))) params)))
 
+(defn wrap-credentials [client credentials?]
+  (fn [request]
+    (client (assoc request :credentials credentials?))))
+
 (defn- parse-xhr [xhr]
   {:body (.-response xhr)
    :headers (util/parse-headers (.getAllResponseHeaders xhr))
    :status (.-status xhr)})
 
-(defn wrap-credentials [client credentials?]
-  (fn [request]
-    (client (assoc request :credentials credentials?))))
+(defn- parse-error [error]
+  (parse-xhr (.-xhr error)))
 
 (defn wrap-response
   "Wrap the XMLHttpRequest of `client` into a Ring response map."
@@ -60,7 +63,7 @@
     (let [result (goog.labs.async.SimpleResult.)]
       (doto (client request)
         (on-success #(.setValue result (parse-xhr %1)))
-        (on-error #(.setError result (parse-xhr %1))))
+        (on-error #(.setError result (parse-error %1))))
       result)))
 
 (defn decode-body
@@ -82,12 +85,15 @@
         (on-error #(.setError result (decode %1))))
       result)))
 
+(defn- read-json [s]
+  (js->clj (json/parse s) :keywordize-keys true))
+
 (defn wrap-json-response
   "Decode application/json responses."
   [client]
   (fn [request]
     (let [result (goog.labs.async.SimpleResult.)
-          decode #(decode-body %1 json/parse "application/json")]
+          decode #(decode-body %1 read-json "application/json")]
       (doto (client request)
         (on-success #(.setValue result (decode %1)))
         (on-error #(.setError result (decode %1))))
@@ -184,17 +190,3 @@
   "Like #'request, but sets the :method and :url as appropriate."
   [url & [req]]
   (request (merge req {:method :put :url url})))
-
-(comment
-
-  (doto (get "http://api.burningswell.dev/continents" {:headers {"Accept" "application/clojure"}})
-    (on-success
-     (fn [resp]
-       (.log js/console "on-success")
-       (println (:body resp))))
-
-    (on-error
-     (fn [resp]
-       (.log js/console "on-error")
-       (println resp))))
-  )
