@@ -11,7 +11,7 @@
          (. (setDomain server-name))
          (. (setPort server-port))
          (. (setPath uri))
-         (. (setQuery query-string)))))
+         (. (setQuery query-string true)))))
 
 (defn user-agent
   "Returns the user agent."
@@ -23,7 +23,7 @@
 
 (defn url-encode
   "Returns an UTF-8 URL encoded version of the given string."
-  [unencoded] (js/escape unencoded))
+  [unencoded] (js/encodeURIComponent unencoded))
 
 (defn parse-headers [headers]
   (reduce
