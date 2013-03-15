@@ -1,4 +1,4 @@
-(defproject cljs-http "0.0.2-SNAPSHOT"
+(defproject cljs-http "0.0.3"
   :description "A ClojureScript HTTP library."
   :dependencies [[org.clojure/clojure "1.4.0"]]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.2"]]}}
