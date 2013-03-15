@@ -1,7 +1,7 @@
 (defproject cljs-http "0.0.2-SNAPSHOT"
   :description "A ClojureScript HTTP library."
   :dependencies [[org.clojure/clojure "1.4.0"]]
-  :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.1"]]}}
+  :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.2"]]}}
   :plugins [[lein-cljsbuild "0.3.0"]]
   :hooks [leiningen.cljsbuild]
   :min-lein-version "2.0.0"
@@ -12,7 +12,7 @@
                                    :pretty-print false}
                         :source-paths ["src"]}
                        {:compiler {:output-to "target/cljs-http-test.js"
-                                   :optimizations :whitespace
+                                   :optimizations :advanced
                                    :pretty-print true}
                         :source-paths ["test"]}]
               :repl-listen-port 9000
