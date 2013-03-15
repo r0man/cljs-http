@@ -1,5 +1,8 @@
-(defproject cljs-http "0.0.3"
+(defproject cljs-http "0.0.4-SNAPSHOT"
   :description "A ClojureScript HTTP library."
+  :url "http://github.com/r0man/cljs-http"
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.2"]]}}
   :plugins [[lein-cljsbuild "0.3.0"]]
