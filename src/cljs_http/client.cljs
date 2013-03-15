@@ -3,7 +3,7 @@
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
             [cljs.reader :refer [read-string]]
-            [clojure.string :refer [join]]
+            [clojure.string :refer [blank? join split]]
             [goog.Uri :as uri]
             [goog.json :as json]
             [goog.labs.async.SimpleResult :as SimpleResult]
@@ -24,6 +24,17 @@
 (defn if-pos [v]
   (if (and v (pos? v)) v))
 
+(defn parse-query-params
+  "Parse `s` as query params and return a hash map."
+  [s]
+  (if-not (blank? s)
+    (reduce
+     #(let [[k v] (split %2 #"=")]
+        (assoc %1
+          (keyword (util/url-decode k))
+          (util/url-decode v)))
+     {} (split (str s) #"&"))))
+
 (defn parse-url
   "Parse `url` into a hash map."
   [url]
@@ -33,10 +44,10 @@
      :server-name (. uri (getDomain))
      :server-port (if-pos (. uri (getPort)))
      :uri (. uri (getPath))
-     :query-data (if-not (. query-data (isEmpty))
-                   query-data)
      :query-string (if-not (. query-data (isEmpty))
-                     (str query-data))}))
+                     (str query-data))
+     :query-params (if-not (. query-data (isEmpty))
+                     (parse-query-params (str query-data)))}))
 
 (def unexceptional-status?
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})

@@ -25,6 +25,10 @@
   "Returns an UTF-8 URL encoded version of the given string."
   [unencoded] (js/encodeURIComponent unencoded))
 
+(defn url-decode
+  "Returns an UTF-8 URL decoded version of the given string."
+  [encoded] (js/decodeURIComponent encoded))
+
 (defn parse-headers [headers]
   (reduce
    #(let [[k v] (split %2 #":\s+")]
