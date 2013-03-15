@@ -10,8 +10,7 @@
                        {:compiler {:output-to "target/cljs-http.js"
                                    :optimizations :advanced
                                    :pretty-print false}
-                        :source-paths ["src"]
-                        :jar true}
+                        :source-paths ["src"]}
                        {:compiler {:output-to "target/cljs-http-test.js"
                                    :optimizations :whitespace
                                    :pretty-print true}
