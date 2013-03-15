@@ -1,4 +1,5 @@
 (ns cljs-http.client
+  (:import goog.labs.async.SimpleResult)
   (:refer-clojure :exclude [get])
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
@@ -6,7 +7,6 @@
             [clojure.string :refer [blank? join split]]
             [goog.Uri :as uri]
             [goog.json :as json]
-            [goog.labs.async.SimpleResult :as SimpleResult]
             [goog.labs.async.wait :as wait]))
 
 (defn wait
@@ -39,14 +39,14 @@
   "Parse `url` into a hash map."
   [url]
   (let [uri (uri/parse url)
-        query-data (. uri (getQueryData))]
-    {:scheme (keyword (. uri (getScheme)))
-     :server-name (. uri (getDomain))
-     :server-port (if-pos (. uri (getPort)))
-     :uri (. uri (getPath))
-     :query-string (if-not (. query-data (isEmpty))
+        query-data (.getQueryData uri)]
+    {:scheme (keyword (.getScheme uri))
+     :server-name (.getDomain uri)
+     :server-port (if-pos (.getPort uri))
+     :uri (.getPath uri)
+     :query-string (if-not (.isEmpty query-data)
                      (str query-data))
-     :query-params (if-not (. query-data (isEmpty))
+     :query-params (if-not (.isEmpty query-data)
                      (parse-query-params (str query-data)))}))
 
 (def unexceptional-status?
@@ -71,7 +71,7 @@
   "Wrap the XMLHttpRequest of `client` into a Ring response map."
   [client]
   (fn [request]
-    (let [result (goog.labs.async.SimpleResult.)]
+    (let [result (SimpleResult.)]
       (doto (client request)
         (on-success #(.setValue result (parse-xhr %1)))
         (on-error #(.setError result (parse-error %1))))
@@ -89,7 +89,7 @@
   "Decode application/clojure responses."
   [client]
   (fn [request]
-    (let [result (goog.labs.async.SimpleResult.)
+    (let [result (SimpleResult.)
           decode #(decode-body %1 read-string "application/clojure")]
       (doto (client request)
         (on-success #(.setValue result (decode %1)))
@@ -103,7 +103,7 @@
   "Decode application/json responses."
   [client]
   (fn [request]
-    (let [result (goog.labs.async.SimpleResult.)
+    (let [result (SimpleResult.)
           decode #(decode-body %1 read-json "application/json")]
       (doto (client request)
         (on-success #(.setValue result (decode %1)))
