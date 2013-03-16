@@ -7,7 +7,7 @@
   "Build the url from the request map."
   [{:keys [scheme server-name server-port uri query-string]}]
   (str (doto (Uri.)
-         (.setScheme (name scheme))
+         (.setScheme (name (or scheme :http)))
          (.setDomain server-name)
          (.setPort server-port)
          (.setPath uri)
