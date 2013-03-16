@@ -85,12 +85,12 @@
     (update-in response [:body] decode-fn)
     response))
 
-(defn wrap-clojure-response
+(defn wrap-edn-response
   "Decode application/clojure responses."
   [client]
   (fn [request]
     (let [result (SimpleResult.)
-          decode #(decode-body %1 read-string "application/clojure")]
+          decode #(decode-body %1 read-string "application/edn")]
       (doto (client request)
         (on-success #(.setValue result (decode %1)))
         (on-error #(.setError result (decode %1))))
@@ -144,7 +144,7 @@
   [request]
   (-> request
       wrap-response
-      wrap-clojure-response
+      wrap-edn-response
       wrap-json-response
       wrap-query-params
       wrap-android-cors-bugfix
