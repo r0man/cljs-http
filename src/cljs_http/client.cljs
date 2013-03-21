@@ -99,6 +99,9 @@
 (defn- read-json [s]
   (js->clj (json/parse s) :keywordize-keys true))
 
+(defn wrap-accept [client accept]
+  #(client (assoc-in %1 [:headers "Accept"] accept)))
+
 (defn wrap-json-response
   "Decode application/json responses."
   [client]
@@ -131,6 +134,9 @@
       (client (-> req (dissoc :method)
                   (assoc :request-method m)))
       (client req))))
+
+(defn wrap-server-name [client server-name]
+  #(client (assoc %1 :server-name server-name)))
 
 (defn wrap-url [client]
   (fn [req]
