@@ -22,12 +22,16 @@
   (let [request {:request-method :get :url "/"}]
     ((client/wrap-basic-auth
       (fn [request]
-        (is (nil? (-> request :headers "authorization"))))))
+        (is (nil? (-> request :headers "authorization")))) request))
     ((client/wrap-basic-auth
       (fn [request]
         (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
-      ["tiger" "scotch"]))
+      ["tiger" "scotch"]) request)
     ((client/wrap-basic-auth
       (fn [request]
         (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
-      {:username "tiger" :password "scotch"}))))
+      {:username "tiger" :password "scotch"}) request)
+    ((client/wrap-basic-auth
+      (fn [request]
+        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization")))))
+     (assoc request :basic-auth ["tiger" "scotch"]))))

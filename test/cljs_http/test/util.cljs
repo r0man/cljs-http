@@ -14,6 +14,8 @@
   (is (= "x" (util/base64-decode "eA.." true))))
 
 (deftest test-basic-auth
+  (is (nil? (util/basic-auth nil)))
+  (is (nil? (util/basic-auth [])))
   (is (= "Basic dGlnZXI6c2NvdGNo"
          (util/basic-auth ["tiger" "scotch"])))
   (is (= "Basic dGlnZXI6c2NvdGNo"

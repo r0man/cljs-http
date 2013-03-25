@@ -149,11 +149,12 @@
   an Authorization header."
   [client & [credentials]]
   (fn [req]
-    (if-let [credentials (or (:basic-auth req) credentials)]
-      (client (-> req (dissoc :basic-auth)
-                  (assoc-in [:headers "authorization"]
-                            (util/basic-auth credentials))))
-      (client req))))
+    (let [credentials (or (:basic-auth req) credentials)]
+      (if-not (empty? credentials)
+        (client (-> req (dissoc :basic-auth)
+                    (assoc-in [:headers "authorization"]
+                              (util/basic-auth credentials))))
+        (client req)))))
 
 (defn wrap-request
   "Returns a battaries-included HTTP request function coresponding to the given

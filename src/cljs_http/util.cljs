@@ -22,7 +22,7 @@
         (if (map? credentials)
           (map credentials [:username :password])
           credentials)]
-    (str "Basic " (base64-encode (str username ":" password)))))
+    (if username (str "Basic " (base64-encode (str username ":" password))))))
 
 (defn build-url
   "Build the url from the request map."
