@@ -144,6 +144,17 @@
       (client (-> req (dissoc :url) (merge (parse-url url))))
       (client req))))
 
+(defn wrap-basic-auth
+  "Middleware converting the :basic-auth option or `credentials` into
+  an Authorization header."
+  [client & [credentials]]
+  (fn [req]
+    (if-let [credentials (or (:basic-auth req) credentials)]
+      (client (-> req (dissoc :basic-auth)
+                  (assoc-in [:headers "authorization"]
+                            (util/basic-auth credentials))))
+      (client req))))
+
 (defn wrap-request
   "Returns a battaries-included HTTP request function coresponding to the given
    core client. See client/client."

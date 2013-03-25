@@ -17,3 +17,17 @@
     (is (= "/test" (:uri request)))
     (is (= "a=1&b=2" (:query-string request)))
     (is (= {:a "1" :b "2"} (:query-params request)))))
+
+(deftest test-wrap-basic-auth
+  (let [request {:request-method :get :url "/"}]
+    ((client/wrap-basic-auth
+      (fn [request]
+        (is (nil? (-> request :headers "authorization"))))))
+    ((client/wrap-basic-auth
+      (fn [request]
+        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
+      ["tiger" "scotch"]))
+    ((client/wrap-basic-auth
+      (fn [request]
+        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
+      {:username "tiger" :password "scotch"}))))

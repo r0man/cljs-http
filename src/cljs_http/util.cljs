@@ -1,7 +1,28 @@
 (ns cljs-http.util
   (:import goog.Uri)
   (:require [clojure.string :refer [split lower-case]]
+            [goog.crypt.base64 :as base64]
             [goog.userAgent :as agent]))
+
+(defn base64-encode
+  "Base64-encode a String."
+  [s & [web-safe]]
+  (base64/encodeString s web-safe))
+
+(defn base64-decode
+  "Base64-decode a String."
+  [s & [web-safe]]
+  (base64/decodeString s web-safe))
+
+(defn basic-auth
+  "Returns the value of the HTTP basic authentication header for
+  `credentials`."
+  [credentials]
+  (let [[username password]
+        (if (map? credentials)
+          (map credentials [:username :password])
+          credentials)]
+    (str "Basic " (base64-encode (str username ":" password)))))
 
 (defn build-url
   "Build the url from the request map."
