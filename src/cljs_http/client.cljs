@@ -99,8 +99,19 @@
 (defn- read-json [s]
   (js->clj (json/parse s) :keywordize-keys true))
 
-(defn wrap-accept [client accept]
-  #(client (assoc-in %1 [:headers "Accept"] accept)))
+(defn wrap-accept
+  [client & [accept]]
+  (fn [request]
+    (if-let [accept (or (:accept request) accept)]
+      (client (assoc-in request [:headers "Accept"] accept))
+      (client request))))
+
+(defn wrap-content-type
+  [client & [content-type]]
+  (fn [request]
+    (if-let [content-type (or (:content-type request) content-type)]
+      (client (assoc-in request [:headers "Content-Type"] content-type))
+      (client request))))
 
 (defn wrap-json-response
   "Decode application/json responses."
@@ -151,9 +162,8 @@
   (fn [req]
     (let [credentials (or (:basic-auth req) credentials)]
       (if-not (empty? credentials)
-        (client (-> req (dissoc :basic-auth)
-                    (assoc-in [:headers "authorization"]
-                              (util/basic-auth credentials))))
+        (client (-> (dissoc req :basic-auth)
+                    (assoc-in [:headers "Authorization"] (util/basic-auth credentials))))
         (client req)))))
 
 (defn wrap-request
