@@ -8,5 +8,7 @@
   [{:keys [request-method headers body credendials] :as request}]
   (let [method (name (or request-method :get))
         url (util/build-url request)
-        options (clj->js {:headers headers :withCredentials credendials})]
+        options (clj->js {:headers (zipmap (map util/camelize (keys headers))
+                                           (vals headers))
+                          :withCredentials credendials})]
     (xhr/send method url body options)))

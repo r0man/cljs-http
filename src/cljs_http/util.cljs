@@ -1,6 +1,6 @@
 (ns cljs-http.util
   (:import goog.Uri)
-  (:require [clojure.string :refer [blank? split lower-case]]
+  (:require [clojure.string :refer [blank? capitalize join split lower-case]]
             [goog.crypt.base64 :as base64]
             [goog.userAgent :as agent]))
 
@@ -33,6 +33,13 @@
          (.setPort server-port)
          (.setPath uri)
          (.setQuery query-string true))))
+
+(defn camelize
+  "Returns dash separeted string `s` in camel case."
+  [s]
+  (->> (split (str s) #"-")
+       (map capitalize)
+       (join "-")))
 
 (defn user-agent
   "Returns the user agent."

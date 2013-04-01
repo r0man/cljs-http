@@ -32,6 +32,13 @@
                           :uri "/continents"
                           :query-string "page=1"}))))
 
+(deftest test-camelize
+  (are [s expected]
+       (is (= expected (camelize s)))
+       "" ""
+       "accept" "Accept"
+       "content-type" "Content-Type"))
+
 (deftest test-url-encode
   (is (= "" (util/url-encode "")))
   (is (= "x" (util/url-encode "x")))

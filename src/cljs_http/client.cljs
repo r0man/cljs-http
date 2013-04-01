@@ -104,14 +104,14 @@
   [client & [accept]]
   (fn [request]
     (if-let [accept (or (:accept request) accept)]
-      (client (assoc-in request [:headers "Accept"] accept))
+      (client (assoc-in request [:headers "accept"] accept))
       (client request))))
 
 (defn wrap-content-type
   [client & [content-type]]
   (fn [request]
     (if-let [content-type (or (:content-type request) content-type)]
-      (client (assoc-in request [:headers "Content-Type"] content-type))
+      (client (assoc-in request [:headers "content-type"] content-type))
       (client request))))
 
 (defn wrap-json-response
@@ -164,7 +164,7 @@
     (let [credentials (or (:basic-auth req) credentials)]
       (if-not (empty? credentials)
         (client (-> (dissoc req :basic-auth)
-                    (assoc-in [:headers "Authorization"] (util/basic-auth credentials))))
+                    (assoc-in [:headers "authorization"] (util/basic-auth credentials))))
         (client req)))))
 
 (defn wrap-request
