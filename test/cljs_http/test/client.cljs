@@ -22,30 +22,30 @@
   (let [request {:request-method :get :url "/"}]
     ((client/wrap-basic-auth
       (fn [request]
-        (is (nil? (-> request :headers "Authorization"))))) request)
+        (is (nil? (-> request :headers "authorization"))))) request)
     ((client/wrap-basic-auth
       (fn [request]
-        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "Authorization"))))
+        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
       ["tiger" "scotch"]) request)
     ((client/wrap-basic-auth
       (fn [request]
-        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "Authorization"))))
+        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
       {:username "tiger" :password "scotch"}) request)
     ((client/wrap-basic-auth
       (fn [request]
-        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "Authorization")))))
+        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization")))))
      (assoc request :basic-auth ["tiger" "scotch"]))))
 
 (deftest test-wrap-content-type
   (let [request {:request-method :get :url "/"}]
     ((client/wrap-content-type
       (fn [request]
-        (is (nil? (-> request :headers "Content-Type"))))) request)
+        (is (nil? (-> request :headers "content-type"))))) request)
     ((client/wrap-content-type
       (fn [request]
-        (is (= "application/edn" (-> request :headers "Content-Type"))))
+        (is (= "application/edn" (-> request :headers "content-type"))))
       "application/edn") request)
     ((client/wrap-content-type
       (fn [request]
-        (is (= "application/edn" (-> request :headers "Content-Type")))))
+        (is (= "application/edn" (-> request :headers "content-type")))))
      (assoc request :content-type "application/edn"))))

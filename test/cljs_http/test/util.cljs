@@ -34,7 +34,7 @@
 
 (deftest test-camelize
   (are [s expected]
-       (is (= expected (camelize s)))
+       (is (= expected (util/camelize s)))
        "" ""
        "accept" "Accept"
        "content-type" "Content-Type"))
