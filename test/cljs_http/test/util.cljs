@@ -1,5 +1,5 @@
 (ns cljs-http.test.util
-  (:require-macros [cemerick.cljs.test :refer [is deftest]])
+  (:require-macros [cemerick.cljs.test :refer [are is deftest]])
   (:require [cemerick.cljs.test :as t]
             [cljs-http.util :as util]))
 
@@ -39,3 +39,10 @@
 
 (deftest test-user-agent
   (util/user-agent))
+
+(deftest test-parse-headers
+  (are [headers expected]
+       (is (= expected (util/parse-headers headers)))
+       "" {}
+       "Content-Type: application/edn\nContent-Length: 10"
+       {"content-type" "application/edn", "content-length" "10"}))

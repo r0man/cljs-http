@@ -1,6 +1,6 @@
 (ns cljs-http.util
   (:import goog.Uri)
-  (:require [clojure.string :refer [split lower-case]]
+  (:require [clojure.string :refer [blank? split lower-case]]
             [goog.crypt.base64 :as base64]
             [goog.userAgent :as agent]))
 
@@ -53,5 +53,6 @@
 (defn parse-headers [headers]
   (reduce
    #(let [[k v] (split %2 #":\s+")]
-      (assoc %1 (lower-case k) v))
+      (if (or (blank? k) (blank? v))
+        %1 (assoc %1 (lower-case k) v)))
    {} (split (or headers "") #"\n")))
