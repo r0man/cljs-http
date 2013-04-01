@@ -60,9 +60,10 @@
     (client (assoc request :credentials credentials?))))
 
 (defn- parse-xhr [xhr]
-  {:body (.-response xhr)
-   :headers (util/parse-headers (.getAllResponseHeaders xhr))
-   :status (.-status xhr)})
+  (-> {:body (.-response xhr)
+       :headers (util/parse-headers (.getAllResponseHeaders xhr))
+       :status (.-status xhr)}
+      (assoc-in [:headers "content-type"] (.getResponseHeader xhr "Content-Type"))))
 
 (defn- parse-error [error]
   (parse-xhr (.-xhr error)))
