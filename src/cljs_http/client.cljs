@@ -1,5 +1,5 @@
 (ns cljs-http.client
-  (:import goog.labs.async.SimpleResult)
+  (:import goog.result.SimpleResult)
   (:refer-clojure :exclude [get])
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
@@ -7,7 +7,7 @@
             [clojure.string :refer [blank? join split]]
             [goog.Uri :as uri]
             [goog.json :as json]
-            [goog.labs.async.wait :as wait]))
+            [goog.result :as wait]))
 
 (defn wait
   "Calls the handler on resolution of the result (success or failure)"
@@ -15,11 +15,11 @@
 
 (defn on-error
   "Calls the handler if the result action errors."
-  [result handler] (wait/onError result #(handler (.getError %1))))
+  [result handler] (wait/waitOnError result #(handler (.getError %1))))
 
 (defn on-success
   "Calls the handler if the result succeeds."
-  [result handler] (wait/onSuccess result handler))
+  [result handler] (wait/waitOnSuccess result handler))
 
 (defn if-pos [v]
   (if (and v (pos? v)) v))
