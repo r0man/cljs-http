@@ -6,6 +6,17 @@ A ClojureScript HTTP library.
 
 Via Clojars: http://clojars.org/cljs-http
 
+## Usage
+
+    (ns example.core
+      (:require [cljs-http.client :as http]
+		[cljs.core.async :refer [<!]])
+      (:require-macros [cljs.core.async.macros :refer [go]]))
+
+    (go (let [response (<! (http/get "https://api.github.com/users"))]
+	  (prn (:status response))
+	  (prn (map :login (:body response)))))
+
 ## License
 
 Copyright (C) 2012-2013 Roman Scherer

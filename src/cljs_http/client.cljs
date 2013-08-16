@@ -222,5 +222,16 @@
   (request (merge req {:method :put :url url})))
 
 (comment
-  (go (prn (:body (<! (get "https://api.github.com/users")))))
+
+  (ns example.core
+    (:require [cljs-http.client :as http]
+              [cljs.core.async :refer [<!]])
+    (:require-macros [cljs.core.async.macros :refer [go]]))
+
+  (go (prn (map :login (:body (<! (get "https://api.github.com/users"))))))
+
+  (go (let [response (<! (get "https://api.github.com/users"))]
+        (prn (:status response))
+        (prn (map :login (:body response)))))
+
   (go (prn (<! (get "http://api.burningswell.dev/continents")))))
