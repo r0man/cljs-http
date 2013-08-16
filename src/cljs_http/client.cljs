@@ -176,6 +176,7 @@
       wrap-edn-response
       wrap-json-response
       wrap-query-params
+      wrap-basic-auth
       wrap-android-cors-bugfix
       wrap-method
       wrap-url))
