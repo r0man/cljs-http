@@ -6,10 +6,6 @@ A ClojureScript HTTP library.
 
 Via Clojars: http://clojars.org/cljs-http
 
-## ClojureScript REPL via Austin
-
-(cemerick.austin.repls/exec :exec-cmds ["chromium"])
-
 ## License
 
 Copyright (C) 2012-2013 Roman Scherer
