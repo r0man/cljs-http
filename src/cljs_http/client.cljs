@@ -44,19 +44,6 @@
 (defn generate-query-string [params]
   (join "&" (map (fn [[k v]] (str (util/url-encode (name k)) "=" (util/url-encode (str v)))) params)))
 
-(defn wrap-credentials [client credentials?]
-  (fn [request]
-    (client (assoc request :credentials credentials?))))
-
-(defn- parse-xhr [xhr]
-  (-> {:body (.-response xhr)
-       :headers (util/parse-headers (.getAllResponseHeaders xhr))
-       :status (.-status xhr)}
-      (assoc-in [:headers "content-type"] (.getResponseHeader xhr "Content-Type"))))
-
-(defn- parse-error [error]
-  (parse-xhr (.-xhr error)))
-
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
   [response decode-fn content-type]

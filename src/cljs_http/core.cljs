@@ -6,7 +6,7 @@
 (defn request
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [request-method headers body credentials] :as request}]
+  [{:keys [request-method headers body] :as request}]
   (let [channel (async/chan)
         method (name (or request-method :get))
         timeout (or (:timeout request) 0)
@@ -19,5 +19,5 @@
               :headers (util/parse-headers (.getAllResponseHeaders target))}
              (async/put! channel))
         (async/close! channel))
-     method body headers timeout credentials)
+     method body headers timeout true)
     channel))
