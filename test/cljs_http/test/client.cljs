@@ -10,6 +10,7 @@
   (is (= {:a "1" :b "2"} (client/parse-query-params "a=1&b=2"))))
 
 (deftest test-parse-url
+  (is (nil? (client/parse-url nil)))
   (let [request (client/parse-url "http://example.com/test?a=1&b=2")]
     (is (= :http (:scheme request)))
     (is (= "example.com" (:server-name request)))
@@ -49,3 +50,14 @@
       (fn [request]
         (is (= "application/edn" (-> request :headers "content-type")))))
      (assoc request :content-type "application/edn"))))
+
+(deftest test-wrap-url
+  (let [request {:request-method :get :url "http://example.com/?b=2" :query-params {:a "1"}}]
+    ((client/wrap-url
+      (fn [request]
+        (is (= :get (:request-method request)))
+        (is (= :http (:scheme request)))
+        (is (= "example.com" (:server-name request)))
+        (is (= "/" (:uri request)))
+        (is (= {:a "1" :b "2"} (:query-params request)))))
+     request)))

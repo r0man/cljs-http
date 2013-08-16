@@ -1,14 +1,23 @@
 (ns cljs-http.core
+  (:import goog.net.XhrIo)
   (:require [cljs-http.util :as util]
-            [goog.labs.net.xhr :as xhr]))
+            [cljs.core.async :as async]))
 
 (defn request
-  "Executes the HTTP request corresponding to the given Ring request
-  map and return a SimpleResult."
-  [{:keys [request-method headers body credendials] :as request}]
-  (let [method (name (or request-method :get))
-        url (util/build-url request)
-        options (clj->js {:headers (zipmap (map util/camelize (keys headers))
-                                           (vals headers))
-                          :withCredentials credendials})]
-    (xhr/send method url body options)))
+  "Execute the HTTP request corresponding to the given Ring request
+  map and return a core.async channel."
+  [{:keys [request-method headers body credentials] :as request}]
+  (let [channel (async/chan)
+        method (name (or request-method :get))
+        timeout (or (:timeout request) 0)
+        headers (util/build-headers headers)]
+    (XhrIo/send
+     (util/build-url request)
+     #(let [target (.-target %1)]
+        (->> {:status (.getStatus target)
+              :body (.getResponseText target)
+              :headers (util/parse-headers (.getAllResponseHeaders target))}
+             (async/put! channel))
+        (async/close! channel))
+     method body headers timeout credentials)
+    channel))

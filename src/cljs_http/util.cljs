@@ -41,6 +41,10 @@
        (map capitalize)
        (join "-")))
 
+(defn build-headers
+  "Build the headers from the map."
+  [m] (clj->js (zipmap (map camelize (keys m)) (vals m))))
+
 (defn user-agent
   "Returns the user agent."
   [] (agent/getUserAgentString))
@@ -62,4 +66,4 @@
    #(let [[k v] (split %2 #":\s+")]
       (if (or (blank? k) (blank? v))
         %1 (assoc %1 (lower-case k) v)))
-   {} (split (or headers "") #"\n")))
+   {} (split (or headers "") #"(\n)|(\r)|(\r\n)|(\n\r)")))

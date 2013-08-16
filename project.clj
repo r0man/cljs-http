@@ -4,10 +4,11 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-1853"]]
+                 [org.clojure/clojurescript "0.0-1853"]
+                 [org.clojure/core.async "0.1.0-SNAPSHOT"]]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]]
                    :plugins [[com.cemerick/austin "0.1.0"]]}}
-  :plugins [[lein-cljsbuild "0.3.0"]]
+  :plugins [[lein-cljsbuild "0.3.2"]]
   :hooks [leiningen.cljsbuild]
   :min-lein-version "2.0.0"
   :cljsbuild {:builds [{:compiler {:output-to "target/cljs-http-debug.js"}
@@ -24,4 +25,5 @@
               :repl-launch-commands
               {"chromium" ["chromium" "http://localhost:9000/"]
                "firefox" ["firefox" "http://localhost:9000/"]}
-              :test-commands {"unit-tests" ["runners/phantomjs.js" "target/cljs-http-test.js"]}})
+              :test-commands {"unit-tests" ["runners/phantomjs.js" "target/cljs-http-test.js"]}}
+  :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
