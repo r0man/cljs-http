@@ -14,8 +14,8 @@ Via Clojars: http://clojars.org/cljs-http
                 [cljs.core.async :refer [<!]]))
 
     (go (let [response (<! (http/get "https://api.github.com/users"))]
-	  (prn (:status response))
-	  (prn (map :login (:body response)))))
+          (prn (:status response))
+          (prn (map :login (:body response)))))
 
 ## License
 
