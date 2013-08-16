@@ -9,9 +9,9 @@ Via Clojars: http://clojars.org/cljs-http
 ## Usage
 
     (ns example.core
+      (:require-macros [cljs.core.async.macros :refer [go]])
       (:require [cljs-http.client :as http]
-		[cljs.core.async :refer [<!]])
-      (:require-macros [cljs.core.async.macros :refer [go]]))
+                [cljs.core.async :refer [<!]]))
 
     (go (let [response (<! (http/get "https://api.github.com/users"))]
 	  (prn (:status response))
