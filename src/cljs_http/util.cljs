@@ -18,11 +18,12 @@
   "Returns the value of the HTTP basic authentication header for
   `credentials`."
   [credentials]
-  (let [[username password]
-        (if (map? credentials)
-          (map credentials [:username :password])
-          credentials)]
-    (if username (str "Basic " (base64-encode (str username ":" password))))))
+  (if credentials
+    (let [[username password]
+          (if (map? credentials)
+            (map credentials [:username :password])
+            credentials)]
+      (str "Basic " (base64-encode (str username ":" password))))))
 
 (defn build-url
   "Build the url from the request map."

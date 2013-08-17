@@ -15,7 +15,7 @@
 
 (deftest test-basic-auth
   (is (nil? (util/basic-auth nil)))
-  (is (nil? (util/basic-auth [])))
+  (is (= "Basic Og==" (util/basic-auth ["" ""])))
   (is (= "Basic dGlnZXI6c2NvdGNo"
          (util/basic-auth ["tiger" "scotch"])))
   (is (= "Basic dGlnZXI6c2NvdGNo"
