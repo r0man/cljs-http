@@ -94,7 +94,7 @@
   (fn [request]
     (if-let [params (:json-params request)]
       (-> (dissoc request :json-params)
-          (assoc :body (util/json-str params))
+          (assoc :body (util/json-encode params))
           (assoc-in [:headers "content-type"] "application/json")
           (client))
       (client request))))
@@ -105,7 +105,7 @@
   (fn [request]
     (let [channel (chan)]
       (go (let [response (<! (client request))]
-            (put! channel (decode-body response util/read-json "application/json"))
+            (put! channel (decode-body response util/json-decode "application/json"))
             (close! channel)))
       channel)))
 

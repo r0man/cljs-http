@@ -39,16 +39,16 @@
     "accept" "Accept"
     "content-type" "Content-Type"))
 
-(deftest test-json-str
+(deftest test-json-encode
   (are [x expected]
-    (is (= expected (util/json-str x)))
+    (is (= expected (util/json-encode x)))
     nil "null"
     1 "1"
     {:a 1} "{\"a\":1}"))
 
-(deftest test-read-json
+(deftest test-json-decode
   (are [x expected]
-    (is (= expected (util/read-json x)))
+    (is (= expected (util/json-decode x)))
     nil nil
     "null" nil
     "1" 1

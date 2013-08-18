@@ -60,7 +60,7 @@
 (deftest test-wrap-json-params
   (let [request ((client/wrap-json-params identity) {:json-params {:a 1}})]
     (is (= "application/json" (-> request :headers "content-type")))
-    (is (= (util/json-str {:a 1}) (-> request :body)))))
+    (is (= (util/json-encode {:a 1}) (-> request :body)))))
 
 (deftest test-wrap-url
   (let [request {:request-method :get :url "http://example.com/?b=2" :query-params {:a "1"}}]

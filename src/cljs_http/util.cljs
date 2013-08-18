@@ -6,12 +6,12 @@
             [goog.userAgent :as agent]))
 
 (defn base64-encode
-  "Base64-encode a String."
+  "Base64 encode a String."
   [s & [web-safe]]
   (base64/encodeString s web-safe))
 
 (defn base64-decode
-  "Base64-decode a String."
+  "Base64 decode a String."
   [s & [web-safe]]
   (base64/decodeString s web-safe))
 
@@ -55,12 +55,15 @@
   "Returns true if the user agent is an Android client."
   [] (re-matches #"(?i).*android.*" (user-agent)))
 
-(defn read-json [s]
+(defn json-decode
+  "JSON decode an object from `s`."
+  [s]
   (if-let [v (json/parse s)]
     (js->clj v :keywordize-keys true)))
 
-(defn json-str [x]
-  (json/serialize (clj->js x)))
+(defn json-encode
+  "JSON encode `x` into a String."
+  [x] (json/serialize (clj->js x)))
 
 (defn url-encode
   "Returns an UTF-8 URL encoded version of the given string."
