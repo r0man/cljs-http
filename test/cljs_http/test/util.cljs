@@ -34,10 +34,25 @@
 
 (deftest test-camelize
   (are [s expected]
-       (is (= expected (util/camelize s)))
-       "" ""
-       "accept" "Accept"
-       "content-type" "Content-Type"))
+    (is (= expected (util/camelize s)))
+    "" ""
+    "accept" "Accept"
+    "content-type" "Content-Type"))
+
+(deftest test-json-str
+  (are [x expected]
+    (is (= expected (util/json-str x)))
+    nil "null"
+    1 "1"
+    {:a 1} "{\"a\":1}"))
+
+(deftest test-read-json
+  (are [x expected]
+    (is (= expected (util/read-json x)))
+    nil nil
+    "null" nil
+    "1" 1
+    "{\"a\":1}" {:a 1}))
 
 (deftest test-url-encode
   (is (= "" (util/url-encode "")))
@@ -49,7 +64,7 @@
 
 (deftest test-parse-headers
   (are [headers expected]
-       (is (= expected (util/parse-headers headers)))
-       "" {}
-       "Content-Type: application/edn\nContent-Length: 10"
-       {"content-type" "application/edn", "content-length" "10"}))
+    (is (= expected (util/parse-headers headers)))
+    "" {}
+    "Content-Type: application/edn\nContent-Length: 10"
+    {"content-type" "application/edn", "content-length" "10"}))

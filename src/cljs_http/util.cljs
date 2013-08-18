@@ -2,6 +2,7 @@
   (:import goog.Uri)
   (:require [clojure.string :refer [blank? capitalize join split lower-case]]
             [goog.crypt.base64 :as base64]
+            [goog.json :as json]
             [goog.userAgent :as agent]))
 
 (defn base64-encode
@@ -53,6 +54,13 @@
 (defn android?
   "Returns true if the user agent is an Android client."
   [] (re-matches #"(?i).*android.*" (user-agent)))
+
+(defn read-json [s]
+  (if-let [v (json/parse s)]
+    (js->clj v :keywordize-keys true)))
+
+(defn json-str [x]
+  (json/serialize (clj->js x)))
 
 (defn url-encode
   "Returns an UTF-8 URL encoded version of the given string."

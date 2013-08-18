@@ -5,8 +5,7 @@
             [cljs.core.async :refer [<! chan close! put!]]
             [cljs.reader :refer [read-string]]
             [clojure.string :refer [blank? join split]]
-            [goog.Uri :as uri]
-            [goog.json :as json])
+            [goog.Uri :as uri])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn if-pos [v]
@@ -52,6 +51,18 @@
     (update-in response [:body] decode-fn)
     response))
 
+(defn wrap-edn-params
+  "Encode :edn-params in the `request` :body and set the appropriate
+  Content Type header."
+  [client]
+  (fn [request]
+    (if-let [params (:edn-params request)]
+      (-> (dissoc request :edn-params)
+          (assoc :body (pr-str params))
+          (assoc-in [:headers "content-type"] "application/edn")
+          (client))
+      (client request))))
+
 (defn wrap-edn-response
   "Decode application/edn responses."
   [client]
@@ -61,9 +72,6 @@
             (put! channel (decode-body response read-string "application/edn"))
             (close! channel)))
       channel)))
-
-(defn- read-json [s]
-  (js->clj (json/parse s) :keywordize-keys true))
 
 (defn wrap-accept
   [client & [accept]]
@@ -79,13 +87,25 @@
       (client (assoc-in request [:headers "content-type"] content-type))
       (client request))))
 
+(defn wrap-json-params
+  "Encode :json-params in the `request` :body and set the appropriate
+  Content Type header."
+  [client]
+  (fn [request]
+    (if-let [params (:json-params request)]
+      (-> (dissoc request :json-params)
+          (assoc :body (util/json-str params))
+          (assoc-in [:headers "content-type"] "application/json")
+          (client))
+      (client request))))
+
 (defn wrap-json-response
   "Decode application/json responses."
   [client]
   (fn [request]
     (let [channel (chan)]
       (go (let [response (<! (client request))]
-            (put! channel (decode-body response read-json "application/json"))
+            (put! channel (decode-body response util/read-json "application/json"))
             (close! channel)))
       channel)))
 
@@ -148,7 +168,9 @@
    core client. See client/client."
   [request]
   (-> request
+      wrap-edn-params
       wrap-edn-response
+      wrap-json-params
       wrap-json-response
       wrap-query-params
       wrap-basic-auth
