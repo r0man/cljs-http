@@ -5,7 +5,8 @@
             [cljs.core.async :refer [<! chan close! put!]]
             [cljs.reader :refer [read-string]]
             [clojure.string :refer [blank? join split]]
-            [goog.Uri :as uri])
+            [goog.Uri :as uri]
+            [no.en.core :refer [url-encode url-decode]])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn if-pos [v]
@@ -18,8 +19,8 @@
     (reduce
      #(let [[k v] (split %2 #"=")]
         (assoc %1
-          (keyword (util/url-decode k))
-          (util/url-decode v)))
+          (keyword (url-decode k))
+          (url-decode v)))
      {} (split (str s) #"&"))))
 
 (defn parse-url
@@ -41,7 +42,7 @@
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
 (defn generate-query-string [params]
-  (join "&" (map (fn [[k v]] (str (util/url-encode (name k)) "=" (util/url-encode (str v)))) params)))
+  (join "&" (map (fn [[k v]] (str (url-encode (name k)) "=" (util/url-encode (str v)))) params)))
 
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."

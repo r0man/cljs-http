@@ -1,19 +1,9 @@
 (ns cljs-http.util
   (:import goog.Uri)
   (:require [clojure.string :refer [blank? capitalize join split lower-case]]
-            [goog.crypt.base64 :as base64]
             [goog.json :as json]
-            [goog.userAgent :as agent]))
-
-(defn base64-encode
-  "Base64 encode a String."
-  [s & [web-safe]]
-  (base64/encodeString s web-safe))
-
-(defn base64-decode
-  "Base64 decode a String."
-  [s & [web-safe]]
-  (base64/decodeString s web-safe))
+            [goog.userAgent :as agent]
+            [no.en.core :refer [base64-encode]]))
 
 (defn basic-auth
   "Returns the value of the HTTP basic authentication header for
@@ -64,14 +54,6 @@
 (defn json-encode
   "JSON encode `x` into a String."
   [x] (json/serialize (clj->js x)))
-
-(defn url-encode
-  "Returns an UTF-8 URL encoded version of the given string."
-  [unencoded] (js/encodeURIComponent unencoded))
-
-(defn url-decode
-  "Returns an UTF-8 URL decoded version of the given string."
-  [encoded] (js/decodeURIComponent encoded))
 
 (defn parse-headers [headers]
   (reduce

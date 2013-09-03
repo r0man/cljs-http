@@ -3,16 +3,6 @@
   (:require [cemerick.cljs.test :as t]
             [cljs-http.util :as util]))
 
-(deftest test-base64-encode
-  (is (= "" (util/base64-encode "")))
-  (is (= "eA==" (util/base64-encode "x")))
-  (is (= "eA.." (util/base64-encode "x" true))))
-
-(deftest test-base64-decode
-  (is (= "" (util/base64-decode "")))
-  (is (= "x" (util/base64-decode "eA==")))
-  (is (= "x" (util/base64-decode "eA.." true))))
-
 (deftest test-basic-auth
   (is (nil? (util/basic-auth nil)))
   (is (= "Basic Og==" (util/basic-auth ["" ""])))
@@ -53,11 +43,6 @@
     "null" nil
     "1" 1
     "{\"a\":1}" {:a 1}))
-
-(deftest test-url-encode
-  (is (= "" (util/url-encode "")))
-  (is (= "x" (util/url-encode "x")))
-  (is (= "1%3D2%263!%C2%A7%24" (util/url-encode "1=2&3!§$"))))
 
 (deftest test-user-agent
   (util/user-agent))
