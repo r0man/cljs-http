@@ -42,7 +42,7 @@
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
 (defn generate-query-string [params]
-  (join "&" (map (fn [[k v]] (str (url-encode (name k)) "=" (util/url-encode (str v)))) params)))
+  (join "&" (map (fn [[k v]] (str (url-encode (name k)) "=" (url-encode (str v)))) params)))
 
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
