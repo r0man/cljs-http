@@ -47,7 +47,7 @@
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
   [response decode-fn content-type]
-  (if (re-find (re-pattern (format "(?i)%s" content-type))
+  (if (re-find (re-pattern (str "(?i)%s" content-type))
                (str (clojure.core/get (:headers response) "content-type" "")))
     (update-in response [:body] decode-fn)
     response))

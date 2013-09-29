@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[noencore "0.1.4"]
                  [org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-1909"]
+                 [org.clojure/clojurescript "0.0-1859"]
                  [org.clojure/core.async "0.1.0-SNAPSHOT"]]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]]
                    :plugins [[com.cemerick/austin "0.1.1"]]}}
