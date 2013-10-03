@@ -47,7 +47,7 @@
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
   [response decode-fn content-type]
-  (if (re-find (re-pattern (str "(?i)%s" content-type))
+  (if (re-find (re-pattern (str "(?i)" content-type))
                (str (clojure.core/get (:headers response) "content-type" "")))
     (update-in response [:body] decode-fn)
     response))
@@ -239,6 +239,10 @@
     (:require-macros [cljs.core.async.macros :refer [go]]))
 
   (go (prn (map :login (:body (<! (get "https://api.github.com/users"))))))
+
+  (go (prn (:status (<! (get "http://api.burningswell.dev/continents")))))
+
+  (go (prn (map :name (:body (<! (get "http://api.burningswell.dev/continents"))))))
 
   (go (let [response (<! (get "https://api.github.com/users"))]
         (prn (:status response))
