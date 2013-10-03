@@ -11,8 +11,8 @@
   (is (= "Basic dGlnZXI6c2NvdGNo"
          (util/basic-auth {:username "tiger" :password "scotch"}))))
 
-;; (deftest test-android?
-;;   (android?))
+;; ;; (deftest test-android?
+;; ;;   (android?))
 
 (deftest test-build-url
   (is (= "https://localhost:80/continents?page=1"

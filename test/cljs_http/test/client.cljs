@@ -24,42 +24,42 @@
   (let [request {:request-method :get :url "/"}]
     ((client/wrap-basic-auth
       (fn [request]
-        (is (nil? (-> request :headers "authorization"))))) request)
+        (is (nil? (get-in request [:headers "authorization"]))))) request)
     ((client/wrap-basic-auth
       (fn [request]
-        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
+        (is (= "Basic dGlnZXI6c2NvdGNo" (get-in request [:headers "authorization"]))))
       ["tiger" "scotch"]) request)
     ((client/wrap-basic-auth
       (fn [request]
-        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization"))))
+        (is (= "Basic dGlnZXI6c2NvdGNo" (get-in request [:headers "authorization"]))))
       {:username "tiger" :password "scotch"}) request)
     ((client/wrap-basic-auth
       (fn [request]
-        (is (= "Basic dGlnZXI6c2NvdGNo" (-> request :headers "authorization")))))
+        (is (= "Basic dGlnZXI6c2NvdGNo" (get-in request [:headers "authorization"])))))
      (assoc request :basic-auth ["tiger" "scotch"]))))
 
 (deftest test-wrap-content-type
   (let [request {:request-method :get :url "/"}]
     ((client/wrap-content-type
       (fn [request]
-        (is (nil? (-> request :headers "content-type"))))) request)
+        (is (nil? (get-in request [:headers "content-type"]))))) request)
     ((client/wrap-content-type
       (fn [request]
-        (is (= "application/edn" (-> request :headers "content-type"))))
+        (is (= "application/edn" (get-in request [:headers "content-type"]))))
       "application/edn") request)
     ((client/wrap-content-type
       (fn [request]
-        (is (= "application/edn" (-> request :headers "content-type")))))
+        (is (= "application/edn" (get-in request [:headers "content-type"])))))
      (assoc request :content-type "application/edn"))))
 
 (deftest test-wrap-edn-params
   (let [request ((client/wrap-edn-params identity) {:edn-params {:a 1}})]
-    (is (= "application/edn" (-> request :headers "content-type")))
+    (is (= "application/edn" (get-in request [:headers "content-type"])))
     (is (= (pr-str {:a 1} ) (-> request :body)))))
 
 (deftest test-wrap-json-params
   (let [request ((client/wrap-json-params identity) {:json-params {:a 1}})]
-    (is (= "application/json" (-> request :headers "content-type")))
+    (is (= "application/json" (get-in request [:headers "content-type"])))
     (is (= (util/json-encode {:a 1}) (-> request :body)))))
 
 (deftest test-wrap-url
