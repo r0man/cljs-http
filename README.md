@@ -13,7 +13,7 @@ Via Clojars: http://clojars.org/cljs-http
       (:require [cljs-http.client :as http]
                 [cljs.core.async :refer [<!]]))
 
-    (go (let [response (<! (http/get "https://api.github.com/users"))]
+    (go (let [response (<! (http/get "https://api.github.com/users" {:with-credentials? false}))]
           (prn (:status response))
           (prn (map :login (:body response)))))
 
