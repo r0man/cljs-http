@@ -3,12 +3,12 @@
   :url "http://github.com/r0man/cljs-http"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[noencore "0.1.11"]
+  :dependencies [[noencore "0.1.12"]
                  [org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2138"]
+                 [org.clojure/clojurescript "0.0-2156"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]]
   :profiles {:dev {:plugins [[com.cemerick/austin "0.1.3"]]}}
-  :plugins [[com.cemerick/clojurescript.test "0.2.1"]
+  :plugins [[com.cemerick/clojurescript.test "0.2.2"]
             [lein-cljsbuild "1.0.1"]]
   :hooks [leiningen.cljsbuild]
   :min-lein-version "2.0.0"
@@ -23,9 +23,5 @@
                                    :optimizations :advanced
                                    :pretty-print true}
                         :source-paths ["test"]}]
-              :repl-listen-port 9000
-              :repl-launch-commands
-              {"chromium" ["chromium" "http://localhost:9000/"]
-               "firefox" ["firefox" "http://localhost:9000/"]}
               :test-commands {"phantom" ["phantomjs" :runner "target/cljs-http-test.js"]}}
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
