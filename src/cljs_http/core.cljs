@@ -14,7 +14,7 @@
         send-credentials (if (nil? with-credentials?)
                              true
                              with-credentials?)]
-    (XhrIo/send
+    (XhrIo.send
      (util/build-url request)
      #(let [target (.-target %1)]
         (->> {:status (.getStatus target)
