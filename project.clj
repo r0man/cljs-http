@@ -9,7 +9,7 @@
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]]
   :profiles {:dev {:plugins [[com.cemerick/austin "0.1.3"]]}}
   :plugins [[com.cemerick/clojurescript.test "0.2.2"]
-            [lein-cljsbuild "1.0.1"]]
+            [lein-cljsbuild "1.0.2"]]
   :hooks [leiningen.cljsbuild]
   :min-lein-version "2.0.0"
   :lein-release {:deploy-via :clojars}
