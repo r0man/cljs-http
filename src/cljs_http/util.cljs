@@ -1,7 +1,6 @@
 (ns cljs-http.util
   (:import goog.Uri)
   (:require [clojure.string :refer [blank? capitalize join split lower-case]]
-            [goog.json :as json]
             [goog.userAgent :as agent]
             [no.en.core :refer [base64-encode]]))
 
@@ -48,12 +47,12 @@
 (defn json-decode
   "JSON decode an object from `s`."
   [s]
-  (if-let [v (json/parse s)]
+  (if-let [v (js/JSON.parse s)]
     (js->clj v :keywordize-keys true)))
 
 (defn json-encode
   "JSON encode `x` into a String."
-  [x] (json/serialize (clj->js x)))
+  [x] (js/JSON.stringify (clj->js x)))
 
 (defn parse-headers [headers]
   (reduce
