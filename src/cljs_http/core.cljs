@@ -1,7 +1,18 @@
 (ns cljs-http.core
-  (:import goog.net.XhrIo)
+  (:import [goog.net EventType XhrIo])
   (:require [cljs-http.util :as util]
             [cljs.core.async :as async]))
+
+(def pending-requests (atom {}))
+
+(defn abort!
+  "Attempt to close the given channel and abort the pending HTTP request
+  with which it is associated."
+  [channel]
+  (when-let [xhr (@pending-requests channel)]
+    (swap! pending-requests dissoc channel)
+    (async/close! channel)
+    (.abort xhr)))
 
 (defn request
   "Execute the HTTP request corresponding to the given Ring request
@@ -14,14 +25,19 @@
         headers (util/build-headers headers)
         send-credentials (if (nil? with-credentials?)
                              true
-                             with-credentials?)]
-    (XhrIo.send request-url
+                             with-credentials?)
+        xhr (doto (XhrIo.)
+                  (.setTimeoutInterval timeout)
+                  (.setWithCredentials send-credentials))]
+    (swap! pending-requests assoc channel xhr)
+    (.listen xhr EventType.COMPLETE
      #(let [target (.-target %1)]
         (->> {:status (.getStatus target)
               :body (.getResponseText target)
               :headers (util/parse-headers (.getAllResponseHeaders target))
               :trace-redirects [request-url (.getLastUri target)]}
              (async/put! channel))
-        (async/close! channel))
-     method body headers timeout send-credentials)
+        (swap! pending-requests dissoc channel)
+        (async/close! channel)))
+    (.send xhr request-url method body headers)
     channel))
