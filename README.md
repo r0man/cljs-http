@@ -17,6 +17,17 @@ Via Clojars: http://clojars.org/cljs-http
           (prn (:status response))
           (prn (map :login (:body response)))))
 
+    ;; POSTing automatically sets Content-Type header and serializes
+    (http/post "http://example.com" {:edn-params {:foo :bar}})
+
+    ;; JSON is auto-converted via `cljs.core/clj->js`
+    (http/post "http://example.com" {:json-params {:foo :bar}})
+
+    ;; HTTP Basic Authentication
+    (http/get
+      "http://example.com"
+      {:basic-auth {:username "hello" :password "world"}})
+
 ## License
 
 Copyright (C) 2012-2013 Roman Scherer
