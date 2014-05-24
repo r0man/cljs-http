@@ -20,6 +20,20 @@
     (is (= "a=1&b=2" (:query-string request)))
     (is (= {:a "1" :b "2"} (:query-params request)))))
 
+(deftest test-wrap-accept
+  (let [request {:request-method :get :url "/"}]
+    ((client/wrap-accept
+      (fn [request]
+        (is (nil? (get-in request [:headers "accept"]))))) request)
+    ((client/wrap-accept
+      (fn [request]
+        (is (= "application/edn" (get-in request [:headers "accept"]))))
+      "application/edn") request)
+    ((client/wrap-accept
+      (fn [request]
+        (is (= "application/edn" (get-in request [:headers "accept"])))))
+     (assoc request :accept "application/edn"))))
+
 (deftest test-wrap-basic-auth
   (let [request {:request-method :get :url "/"}]
     ((client/wrap-basic-auth
