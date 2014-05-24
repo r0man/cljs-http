@@ -169,6 +169,8 @@
    core client. See client/client."
   [request]
   (-> request
+      wrap-accept
+      wrap-content-type
       wrap-edn-params
       wrap-edn-response
       wrap-json-params
