@@ -24,20 +24,20 @@
         timeout (or (:timeout request) 0)
         headers (util/build-headers headers)
         send-credentials (if (nil? with-credentials?)
-                             true
-                             with-credentials?)
+                           true
+                           with-credentials?)
         xhr (doto (XhrIo.)
-                  (.setTimeoutInterval timeout)
-                  (.setWithCredentials send-credentials))]
+              (.setTimeoutInterval timeout)
+              (.setWithCredentials send-credentials))]
     (swap! pending-requests assoc channel xhr)
     (.listen xhr EventType.COMPLETE
-     #(let [target (.-target %1)]
-        (->> {:status (.getStatus target)
-              :body (.getResponseText target)
-              :headers (util/parse-headers (.getAllResponseHeaders target))
-              :trace-redirects [request-url (.getLastUri target)]}
-             (async/put! channel))
-        (swap! pending-requests dissoc channel)
-        (async/close! channel)))
+             #(let [target (.-target %1)]
+                (->> {:status (.getStatus target)
+                      :body (.getResponseText target)
+                      :headers (util/parse-headers (.getAllResponseHeaders target))
+                      :trace-redirects [request-url (.getLastUri target)]}
+                     (async/put! channel))
+                (swap! pending-requests dissoc channel)
+                (async/close! channel)))
     (.send xhr request-url method body headers)
     channel))
