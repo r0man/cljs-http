@@ -10,6 +10,8 @@ A ClojureScript HTTP library.
 
 Via Clojars: http://clojars.org/cljs-http
 
+[![Current Version](https://clojars.org/cljs-http/latest-version.svg)](https://clojars.org/cljs-http)
+
 ## Usage
 
 ```clojure
