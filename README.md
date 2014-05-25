@@ -4,6 +4,8 @@
 
 A ClojureScript HTTP library.
 
+![](http://imgs.xkcd.com/comics/server_attention_span.png)
+
 ## Installation
 
 Via Clojars: http://clojars.org/cljs-http
