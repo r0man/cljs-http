@@ -39,6 +39,6 @@ Via Clojars: http://clojars.org/cljs-http
 
 ## License
 
-Copyright (C) 2012-2014 Roman Scherer
+Copyright (C) 2012-2014 r0man
 
 Distributed under the Eclipse Public License, the same as Clojure.
