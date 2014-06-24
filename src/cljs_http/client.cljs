@@ -46,9 +46,10 @@
 
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
-  [response decode-fn content-type]
-  (if (re-find (re-pattern (str "(?i)" content-type))
-               (str (clojure.core/get (:headers response) "content-type" "")))
+  [response decode-fn content-type request-method]
+  (if (and (not= :head request-method)
+           (re-find (re-pattern (str "(?i)" content-type))
+                    (str (clojure.core/get (:headers response) "content-type" ""))))
     (update-in response [:body] decode-fn)
     response))
 
@@ -70,7 +71,7 @@
   (fn [request]
     (let [channel (chan)]
       (go (let [response (<! (client request))]
-            (put! channel (decode-body response read-string "application/edn"))
+            (put! channel (decode-body response read-string "application/edn" (:request-method request)))
             (close! channel)))
       channel)))
 
@@ -106,7 +107,7 @@
   (fn [request]
     (let [channel (chan)]
       (go (let [response (<! (client request))]
-            (put! channel (decode-body response util/json-decode "application/json"))
+            (put! channel (decode-body response util/json-decode "application/json" (:request-method request)))
             (close! channel)))
       channel)))
 
