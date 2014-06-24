@@ -12,7 +12,7 @@
             [lein-cljsbuild "1.0.3"]]
   :hooks [leiningen.cljsbuild]
   :min-lein-version "2.0.0"
-  :lein-release {:deploy-via :clojars}
+  :deploy-repositories [["releases" :clojars]]
   :cljsbuild {:builds [{:compiler {:output-to "target/cljs-http-debug.js"}
                         :source-paths ["src"]}
                        {:compiler {:output-to "target/cljs-http.js"
