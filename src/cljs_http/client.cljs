@@ -41,8 +41,13 @@
 (def unexceptional-status?
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
+(defn- encode-param [[k v]]
+  (str (url-encode (name k)) "=" (url-encode (str v))))
 (defn generate-query-string [params]
-  (join "&" (map (fn [[k v]] (str (url-encode (name k)) "=" (url-encode (str v)))) params)))
+  (->>
+    params
+    (map encode-param)
+    (join "&")))
 
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
@@ -119,6 +124,15 @@
                     (generate-query-string query-params))))
       (client req))))
 
+(defn wrap-form-params [client]
+  (fn [{:keys [form-params request-method] :as request}]
+    (if (and form-params (#{:post :put :patch :delete} request-method))
+      (client (-> request
+                  (dissoc :form-params)
+                  (assoc :body (generate-query-string form-params))
+                  (assoc-in [:headers "content-type"] "application/x-www-form-urlencoded")))
+      (client request))))
+
 (defn wrap-android-cors-bugfix [client]
   (fn [request]
     (client
@@ -166,11 +180,12 @@
       (client req))))
 
 (defn wrap-request
-  "Returns a battaries-included HTTP request function coresponding to the given
+  "Returns a batteries-included HTTP request function coresponding to the given
    core client. See client/client."
   [request]
   (-> request
       wrap-accept
+      wrap-form-params
       wrap-content-type
       wrap-edn-params
       wrap-edn-response

@@ -1,5 +1,5 @@
 (ns cljs-http.test.client
-  (:require-macros [cemerick.cljs.test :refer [is deftest]])
+  (:require-macros [cemerick.cljs.test :refer [is deftest testing]])
   (:require [cemerick.cljs.test :as t]
             [cljs-http.client :as client]
             [cljs-http.util :as util]))
@@ -86,3 +86,26 @@
         (is (= "/" (:uri request)))
         (is (= {:a "1" :b "2"} (:query-params request)))))
      request)))
+
+(deftest test-wrap-form-params
+  (testing "With form params"
+    (let [request {:request-method :post :form-params (sorted-map :param1 "value1" :param2 "value2")}
+          response ((client/wrap-form-params identity) request)]
+      (is (= "param1=value1&param2=value2" (:body response)))
+      (is (= "application/x-www-form-urlencoded" (get-in response [:headers "content-type"])))
+      (is (not (contains? response :form-params))))
+    (let [request {:request-method :put :form-params (sorted-map :param1 "value1" :param2 "value2")}
+          response ((client/wrap-form-params identity) request)]
+      (is (= "param1=value1&param2=value2" (:body response)))
+      (is (= "application/x-www-form-urlencoded" (get-in response [:headers "content-type"])))
+      (is (not (contains? response :form-params)))))
+  (testing "Ensure it does not affect GET requests"
+    (let [request {:request-method :get :body "untouched" :form-params {:param1 "value1" :param2 "value2"}}
+          response ((client/wrap-form-params identity) request)]
+      (is (= "untouched" (:body response)))
+      (is (not (contains? (:headers response) "content-type")))))
+  (testing "with no form params"
+    (let [request {:body "untouched"}
+          response ((client/wrap-form-params identity) request)]
+      (is (= "untouched" (:body response)))
+      (is (not (contains? (:headers response) "content-type"))))))
