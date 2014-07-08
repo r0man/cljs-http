@@ -41,8 +41,17 @@
 (def unexceptional-status?
   #{200 201 202 203 204 205 206 207 300 301 302 303 307})
 
-(defn- encode-param [[k v]]
+(defn- enconde-val [k v]
   (str (url-encode (name k)) "=" (url-encode (str v))))
+(defn- encode-vals [k vs]
+  (->>
+    (map #(encode-val k %) vs)
+    (join "&")))
+(defn- encode-param [[k v]]
+  (if (coll? v)
+    (encode-vals k v)
+    (encode-val k v)))
+
 (defn generate-query-string [params]
   (->>
     params
