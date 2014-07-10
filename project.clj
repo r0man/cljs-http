@@ -3,10 +3,10 @@
   :url "http://github.com/r0man/cljs-http"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[noencore "0.1.15"]
+  :dependencies [[noencore "0.1.16"]
                  [org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2234"]
-                 [org.clojure/core.async "0.1.301.0-deb34a-alpha"]]
+                 [org.clojure/clojurescript "0.0-2268"]
+                 [org.clojure/core.async "0.1.303.0-886421-alpha"]]
   :profiles {:dev {:plugins [[com.cemerick/austin "0.1.3"]]}}
   :plugins [[com.cemerick/clojurescript.test "0.3.0"]
             [lein-cljsbuild "1.0.3"]]
