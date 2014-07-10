@@ -98,6 +98,11 @@
           response ((client/wrap-form-params identity) request)]
       (is (= "param1=value1&param2=value2" (:body response)))
       (is (= "application/x-www-form-urlencoded" (get-in response [:headers "content-type"])))
+      (is (not (contains? response :form-params))))
+    (let [request {:request-method :put :form-params (sorted-map :param1 [1 2 3] :param2 "value2")}
+          response ((client/wrap-form-params identity) request)]
+      (is (= "param1=1&param1=2&param1=3&param2=value2" (:body response)))
+      (is (= "application/x-www-form-urlencoded" (get-in response [:headers "content-type"])))
       (is (not (contains? response :form-params)))))
   (testing "Ensure it does not affect GET requests"
     (let [request {:request-method :get :body "untouched" :form-params {:param1 "value1" :param2 "value2"}}

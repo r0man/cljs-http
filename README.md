@@ -31,6 +31,12 @@ Via Clojars: http://clojars.org/cljs-http
 ;; JSON is auto-converted via `cljs.core/clj->js`
 (http/post "http://example.com" {:json-params {:foo :bar}})
 
+;; Form parameters in a POST request (simple)
+(http/post "http://example.com" {:form-params {:key1 "value1" :key2 "value2"}})
+
+;; Form parameters in a POST request (array of values)
+(http/post "http://example.com" {:form-params {:key1 [1 2 3] :key2 "value2"}})
+
 ;; HTTP Basic Authentication
 (http/get
   "http://example.com"
