@@ -33,6 +33,7 @@
     (.listen xhr EventType.COMPLETE
              #(let [target (.-target %1)]
                 (->> {:status (.getStatus target)
+                      :success (.isSuccess target)
                       :body (.getResponseText target)
                       :headers (util/parse-headers (.getAllResponseHeaders target))
                       :trace-redirects [request-url (.getLastUri target)]}
