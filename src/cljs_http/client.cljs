@@ -61,11 +61,23 @@
     (map encode-param)
     (join "&")))
 
+(def regex-char-esc-smap
+  (let [esc-chars "()*&^%$#!+"]
+    (zipmap esc-chars
+            (map #(str "\\" %) esc-chars))))
+
+(defn escape-special
+  "Escape special characters -- for content-type."
+  [string]
+  (->> string
+       (replace regex-char-esc-smap)
+       (reduce str)))
+
 (defn decode-body
   "Decocde the :body of `response` with `decode-fn` if the content type matches."
   [response decode-fn content-type request-method]
   (if (and (not= :head request-method)
-           (re-find (re-pattern (str "(?i)" content-type))
+           (re-find (re-pattern (str "(?i)" (escape-special content-type)))
                     (str (clojure.core/get (:headers response) "content-type" ""))))
     (update-in response [:body] decode-fn)
     response))
@@ -105,6 +117,44 @@
     (if-let [content-type (or (:content-type request) content-type)]
       (client (assoc-in request [:headers "content-type"] content-type))
       (client request))))
+
+(def ^{:private true} default-transit-opts
+  {:encoding :json :encoding-opts {}
+   :decoding :json :decoding-opts {}})
+
+(defn wrap-transit-params
+  "Encode :transit-params in the `request` :body and set the appropriate
+  Content Type header.
+
+  A :transit-opts map can be optionally provided with the following keys:
+
+  :encoding                #{:json, :json-verbose}
+  :decoding                #{:json, :json-verbose}
+  :encoding/decoding-opts  appropriate map of options to be passed to
+                           transit writer/reader, respectively."
+  [client]
+  (fn [request]
+    (if-let [params (:transit-params request)]
+      (let [{:keys [encoding encoding-opts]} (merge default-transit-opts
+                                                    (:transit-opts request))]
+        (-> (dissoc request :transit-params)
+            (assoc :body (util/transit-encode params encoding encoding-opts))
+            (assoc-in [:headers "content-type"] "application/transit+json")
+            (client)))
+      (client request))))
+
+(defn wrap-transit-response
+  "Decode application/transit+json responses."
+  [client]
+  (fn [request]
+    (let [channel (chan)
+          {:keys [decoding decoding-opts]} (merge default-transit-opts
+                                                  (:transit-opts request))]
+      (go (let [response (<! (client request))]
+            (put! channel (decode-body response #(util/transit-decode % decoding decoding-opts)
+                                       "application/transit+json" (:request-method request)))
+            (close! channel)))
+      channel)))
 
 (defn wrap-json-params
   "Encode :json-params in the `request` :body and set the appropriate
@@ -201,6 +251,8 @@
       wrap-content-type
       wrap-edn-params
       wrap-edn-response
+      wrap-transit-params
+      wrap-transit-response
       wrap-json-params
       wrap-json-response
       wrap-query-params
