@@ -17,9 +17,10 @@
 
 (defn build-url
   "Build the url from the request map."
-  [{:keys [scheme server-name server-port uri query-string]}]
+  [{:keys [scheme server-name server-port uri query-string user-info]}]
   (str (doto (Uri.)
          (.setScheme (name (or scheme :http)))
+         (.setUserInfo user-info)
          (.setDomain server-name)
          (.setPort server-port)
          (.setPath uri)

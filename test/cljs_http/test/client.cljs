@@ -12,8 +12,9 @@
 
 (deftest test-parse-url
   (is (nil? (client/parse-url nil)))
-  (let [request (client/parse-url "http://example.com/test?a=1&b=2")]
+  (let [request (client/parse-url "http://user:pass@example.com/test?a=1&b=2")]
     (is (= :http (:scheme request)))
+    (is (= "user:pass" (:user-info request)))
     (is (= "example.com" (:server-name request)))
     (is (nil? (:server-port request)))
     (is (= "/test" (:uri request)))

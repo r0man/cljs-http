@@ -33,6 +33,7 @@
        :server-name (.getDomain uri)
        :server-port (if-pos (.getPort uri))
        :uri (.getPath uri)
+       :user-info (.getUserInfo uri)
        :query-string (if-not (.isEmpty query-data)
                        (str query-data))
        :query-params (if-not (.isEmpty query-data)
