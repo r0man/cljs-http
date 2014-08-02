@@ -28,12 +28,14 @@
   [url]
   (if-not (blank? url)
     (let [uri (uri/parse url)
-          query-data (.getQueryData uri)]
+          query-data (.getQueryData uri)
+          user-info (.getUserInfo uri)
+          basic-auth (rest (re-find #"^(.*):(.*)$" user-info))]
       {:scheme (keyword (.getScheme uri))
        :server-name (.getDomain uri)
        :server-port (if-pos (.getPort uri))
        :uri (.getPath uri)
-       :user-info (.getUserInfo uri)
+       :basic-auth basic-auth
        :query-string (if-not (.isEmpty query-data)
                        (str query-data))
        :query-params (if-not (.isEmpty query-data)

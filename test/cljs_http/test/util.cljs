@@ -15,11 +15,10 @@
 ;; ;;   (android?))
 
 (deftest test-build-url
-  (is (= "https://user:pass@localhost:80/continents?page=1"
+  (is (= "https://localhost:80/continents?page=1"
          (util/build-url {:scheme :https
                           :server-name "localhost"
                           :server-port 80
-                          :user-info "user:pass"
                           :uri "/continents"
                           :query-string "page=1"}))))
 
