@@ -66,6 +66,11 @@
         (is (= "application/edn" (get-in request [:headers "content-type"])))))
      (assoc request :content-type "application/edn"))))
 
+(deftest test-wrap-transit-params
+  (let [request ((client/wrap-transit-params identity) {:transit-params {:a 1}})]
+    (is (= "application/transit+json" (get-in request [:headers "content-type"])))
+    (is (= (util/transit-encode {:a 1} :json nil) (-> request :body)))))
+
 (deftest test-wrap-edn-params
   (let [request ((client/wrap-edn-params identity) {:edn-params {:a 1}})]
     (is (= "application/edn" (get-in request [:headers "content-type"])))
