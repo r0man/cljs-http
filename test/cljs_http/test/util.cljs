@@ -29,6 +29,21 @@
     "accept" "Accept"
     "content-type" "Content-Type"))
 
+(deftest test-transit-encode
+  (are [x expected]
+    (is (= expected (util/transit-encode x :json nil)))
+    nil    "[\"~#'\",null]"
+    1      "[\"~#'\",1]"
+    {:a 1} "[\"^ \",\"~:a\",1]"))
+
+(deftest test-transit-decode
+  (are [x expected]
+    (is (= expected (util/transit-decode x :json nil)))
+    nil nil
+    "null" nil
+    "1" 1
+    "[\"^ \",\"~:a\",1]" {:a 1}))
+
 (deftest test-json-encode
   (are [x expected]
     (is (= expected (util/json-encode x)))
