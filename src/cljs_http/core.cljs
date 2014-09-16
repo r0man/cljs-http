@@ -17,7 +17,8 @@
 (defn request
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [request-method headers body with-credentials?] :as request}]
+  [{:keys [request-method headers body response-type with-credentials?] :as request
+    :or {response-type ""}}]
   (let [channel (async/chan)
         request-url (util/build-url request)
         method (name (or request-method :get))
@@ -28,13 +29,16 @@
                            with-credentials?)
         xhr (doto (XhrIo.)
               (.setTimeoutInterval timeout)
-              (.setWithCredentials send-credentials))]
+              (.setWithCredentials send-credentials)
+              (.setResponseType response-type))]
     (swap! pending-requests assoc channel xhr)
     (.listen xhr EventType.COMPLETE
              #(let [target (.-target %1)]
                 (->> {:status (.getStatus target)
                       :success (.isSuccess target)
                       :body (.getResponseText target)
+                      :response-type (.getResponseType target)
+                      :response (.getResponse target)
                       :headers (util/parse-headers (.getAllResponseHeaders target))
                       :trace-redirects [request-url (.getLastUri target)]}
                      (async/put! channel))
