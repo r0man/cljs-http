@@ -320,6 +320,9 @@
               [cljs.core.async :refer [<!]])
     (:require-macros [cljs.core.async.macros :refer [go]]))
 
+  (go (prn (map :login (<! (get "https://api.github.com/users"
+                                {:channel (chan 1 (map :body))})))))
+
   (go (prn (map :login (:body (<! (get "https://api.github.com/users"))))))
 
   (go (prn (:status (<! (get "http://api.burningswell.dev/continents")))))
