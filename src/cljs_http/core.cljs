@@ -14,11 +14,14 @@
     (async/close! channel)
     (.abort xhr)))
 
+(defn channel-for-request [request]
+  (or (:channel request) (async/chan)))
+
 (defn request
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
   [{:keys [request-method headers body with-credentials?] :as request}]
-  (let [channel (async/chan)
+  (let [channel (channel-for-request request)
         request-url (util/build-url request)
         method (name (or request-method :get))
         timeout (or (:timeout request) 0)

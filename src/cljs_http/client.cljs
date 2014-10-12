@@ -98,7 +98,7 @@
   "Decode application/edn responses."
   [client]
   (fn [request]
-    (let [channel (chan)]
+    (let [channel (core/channel-for-request request)]
       (go (let [response (<! (client request))]
             (put! channel (decode-body response read-string "application/edn" (:request-method request)))
             (close! channel)))
@@ -147,7 +147,7 @@
   "Decode application/transit+json responses."
   [client]
   (fn [request]
-    (let [channel (chan)
+    (let [channel (core/channel-for-request request)
           {:keys [decoding decoding-opts]} (merge default-transit-opts
                                                   (:transit-opts request))]
       (go (let [response (<! (client request))]
@@ -172,7 +172,7 @@
   "Decode application/json responses."
   [client]
   (fn [request]
-    (let [channel (chan)]
+    (let [channel (core/channel-for-request request)]
       (go (let [response (<! (client request))]
             (put! channel (decode-body response util/json-decode "application/json" (:request-method request)))
             (close! channel)))
