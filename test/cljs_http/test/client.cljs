@@ -1,7 +1,9 @@
 (ns cljs-http.test.client
   (:require-macros [cemerick.cljs.test :refer [is deftest testing]])
   (:require [cemerick.cljs.test :as t]
+            [cljs.core.async :as async]
             [cljs-http.client :as client]
+            [cljs-http.core :as core]
             [cljs-http.util :as util]))
 
 (deftest test-parse-query-params
@@ -119,3 +121,14 @@
           response ((client/wrap-form-params identity) request)]
       (is (= "untouched" (:body response)))
       (is (not (contains? (:headers response) "content-type"))))))
+
+(deftest test-custom-channel
+  (let [c (async/chan 1)
+        request-no-chan {:request-method :get :url "http://localhost/"}
+        request-with-chan {:request-method :get :url "http://localhost/" :channel c}]
+    (testing "channel-for-request"
+      (is (not= c (core/channel-for-request request-no-chan)))
+      (is (= c (core/channel-for-request request-with-chan))))
+    (testing "request api with middleware"
+      (is (not= c (client/request request-no-chan)))
+      (is (= c (client/request request-with-chan))))))
