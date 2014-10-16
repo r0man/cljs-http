@@ -3,7 +3,6 @@
   (:require [cemerick.cljs.test :as t]
             [cljs.core.async :as async]
             [cljs-http.client :as client]
-            [cljs-http.core :as core]
             [cljs-http.util :as util]))
 
 (deftest test-parse-query-params
@@ -127,8 +126,8 @@
         request-no-chan {:request-method :get :url "http://localhost/"}
         request-with-chan {:request-method :get :url "http://localhost/" :channel c}]
     (testing "channel-for-request"
-      (is (not= c (core/channel-for-request request-no-chan)))
-      (is (= c (core/channel-for-request request-with-chan))))
+      (is (not= c (client/channel-for-request request-no-chan)))
+      (is (= c (client/channel-for-request request-with-chan))))
     (testing "request api with middleware"
       (is (not= c (client/request request-no-chan)))
       (is (= c (client/request request-with-chan))))))
