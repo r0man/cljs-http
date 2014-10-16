@@ -82,6 +82,9 @@
     (update-in response [:body] decode-fn)
     response))
 
+(defn channel-for-request [request]
+  (or (:channel request) (chan)))
+
 (defn wrap-edn-params
   "Encode :edn-params in the `request` :body and set the appropriate
   Content Type header."
@@ -98,8 +101,8 @@
   "Decode application/edn responses."
   [client]
   (fn [request]
-    (let [channel (core/channel-for-request request)]
-      (go (let [response (<! (client request))]
+    (let [channel (channel-for-request request)]
+      (go (if-let [response (<! (client request))]
             (put! channel (decode-body response read-string "application/edn" (:request-method request)))
             (close! channel)))
       channel)))
@@ -147,10 +150,10 @@
   "Decode application/transit+json responses."
   [client]
   (fn [request]
-    (let [channel (core/channel-for-request request)
+    (let [channel (channel-for-request request)
           {:keys [decoding decoding-opts]} (merge default-transit-opts
                                                   (:transit-opts request))]
-      (go (let [response (<! (client request))]
+      (go (if-let [response (<! (client request))]
             (put! channel (decode-body response #(util/transit-decode % decoding decoding-opts)
                                        "application/transit+json" (:request-method request)))
             (close! channel)))
@@ -172,8 +175,8 @@
   "Decode application/json responses."
   [client]
   (fn [request]
-    (let [channel (core/channel-for-request request)]
-      (go (let [response (<! (client request))]
+    (let [channel (channel-for-request request)]
+      (go (if-let [response (<! (client request))]
             (put! channel (decode-body response util/json-decode "application/json" (:request-method request)))
             (close! channel)))
       channel)))
