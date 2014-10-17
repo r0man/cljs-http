@@ -126,9 +126,6 @@
   (let [c (async/chan 1)
         request-no-chan {:request-method :get :url "http://localhost/"}
         request-with-chan {:request-method :get :url "http://localhost/" :channel c}]
-    (testing "channel-for-request"
-      (is (not= c (core/channel-for-request request-no-chan)))
-      (is (= c (core/channel-for-request request-with-chan))))
     (testing "request api with middleware"
       (is (not= c (client/request request-no-chan)))
       (is (= c (client/request request-with-chan))))))

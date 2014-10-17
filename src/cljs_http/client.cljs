@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [get])
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
-            [cljs.core.async :refer [<! chan close! put!]]
+            [cljs.core.async :as async :refer [<! chan close! put!]]
             [cljs.reader :refer [read-string]]
             [clojure.string :refer [blank? join split]]
             [goog.Uri :as uri]
@@ -98,11 +98,8 @@
   "Decode application/edn responses."
   [client]
   (fn [request]
-    (let [channel (core/channel-for-request request)]
-      (go (let [response (<! (client request))]
-            (put! channel (decode-body response read-string "application/edn" (:request-method request)))
-            (close! channel)))
-      channel)))
+    (-> #(decode-body % read-string "application/edn" (:request-method request))
+        (async/map [(client request)]))))
 
 (defn wrap-accept
   [client & [accept]]
@@ -147,14 +144,12 @@
   "Decode application/transit+json responses."
   [client]
   (fn [request]
-    (let [channel (core/channel-for-request request)
-          {:keys [decoding decoding-opts]} (merge default-transit-opts
-                                                  (:transit-opts request))]
-      (go (let [response (<! (client request))]
-            (put! channel (decode-body response #(util/transit-decode % decoding decoding-opts)
-                                       "application/transit+json" (:request-method request)))
-            (close! channel)))
-      channel)))
+    (let [{:keys [decoding decoding-opts]} (merge default-transit-opts
+                                                  (:transit-opts request))
+          transit-decode #(util/transit-decode % decoding decoding-opts)]
+
+      (-> #(decode-body % transit-decode "application/transit+json" (:request-method request))
+          (async/map [(client request)])))))
 
 (defn wrap-json-params
   "Encode :json-params in the `request` :body and set the appropriate
@@ -172,11 +167,8 @@
   "Decode application/json responses."
   [client]
   (fn [request]
-    (let [channel (core/channel-for-request request)]
-      (go (let [response (<! (client request))]
-            (put! channel (decode-body response util/json-decode "application/json" (:request-method request)))
-            (close! channel)))
-      channel)))
+    (-> #(decode-body % util/json-decode "application/json" (:request-method request))
+        (async/map [(client request)]))))
 
 (defn wrap-query-params [client]
   (fn [{:keys [query-params] :as req}]
@@ -241,6 +233,15 @@
                             (str "Bearer " oauth-token))))
       (client req))))
 
+(defn wrap-channel-from-request-map
+  "Pipe the response-channel into the request-map's
+   custom channel (e.g. to enable transducers)"
+  [client]
+  (fn [request]
+    (if-let [custom-channel (:channel request)]
+      (async/pipe (client request) custom-channel)
+      (client request))))
+
 (defn wrap-request
   "Returns a batteries-included HTTP request function coresponding to the given
    core client. See client/client."
@@ -260,7 +261,8 @@
       wrap-oauth
       wrap-android-cors-bugfix
       wrap-method
-      wrap-url))
+      wrap-url
+      wrap-channel-from-request-map))
 
 (def #^{:doc
         "Executes the HTTP request corresponding to the given map and returns the
