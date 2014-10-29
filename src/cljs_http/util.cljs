@@ -60,7 +60,7 @@
 (defn json-decode
   "JSON decode an object from `s`."
   [s]
-  (if-let [v (js/JSON.parse s)]
+  (if-let [v (if-not (clojure.string/blank? s) (js/JSON.parse s))]
     (js->clj v :keywordize-keys true)))
 
 (defn json-encode
