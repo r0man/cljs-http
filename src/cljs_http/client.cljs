@@ -187,13 +187,6 @@
                   (assoc-in [:headers "content-type"] "application/x-www-form-urlencoded")))
       (client request))))
 
-(defn wrap-android-cors-bugfix [client]
-  (fn [request]
-    (client
-     (if (util/android?)
-       (assoc-in request [:query-params :android] (Math/random))
-       request))))
-
 (defn wrap-method [client]
   (fn [req]
     (if-let [m (:method req)]
@@ -259,7 +252,6 @@
       wrap-query-params
       wrap-basic-auth
       wrap-oauth
-      wrap-android-cors-bugfix
       wrap-method
       wrap-url
       wrap-channel-from-request-map))
