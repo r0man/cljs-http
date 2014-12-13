@@ -7,7 +7,7 @@
                  [org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2371"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [com.cognitect/transit-cljs "0.8.192"]]
+                 [com.cognitect/transit-cljs "0.8.194"]]
   :profiles {:dev {:plugins [[com.cemerick/austin "0.1.3"]]}}
   :plugins [[com.cemerick/clojurescript.test "0.3.0"]
             [lein-cljsbuild "1.0.3"]]
