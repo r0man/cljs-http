@@ -31,6 +31,9 @@ Via Clojars: http://clojars.org/cljs-http
 ;; JSON is auto-converted via `cljs.core/clj->js`
 (http/post "http://example.com" {:json-params {:foo :bar}})
 
+;; POSTing JSON in verbose Transit format
+(http/post "http://example.com" {:transit-params {:key1 "value1" :key2 "value2"}})
+
 ;; Form parameters in a POST request (simple)
 (http/post "http://example.com" {:form-params {:key1 "value1" :key2 "value2"}})
 
