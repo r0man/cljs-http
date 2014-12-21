@@ -40,6 +40,17 @@ Via Clojars: http://clojars.org/cljs-http
 ;; Form parameters in a POST request (array of values)
 (http/post "http://example.com" {:form-params {:key1 [1 2 3] :key2 "value2"}})
 
+;; Multipart parameters in a POST request to upload file
+(http/post "http://example.com" {:multipart-params {:key1 "value1" :my-file my-file}})
+;; where `my-file` can one of these:
+;; - a Blob instance, eg:
+;; (let [my-file (js/Blob. #js ["<h1>Hello</h1>"] #js {:type "text/html})] ...)
+;; - a File instance, eg:
+;; HTML: <input id="my-file" type="file">
+;; (let [my-file (-> (.getElementById js/document "my-file")
+;;                   .-files first)]
+;;   ...)
+
 ;; HTTP Basic Authentication
 (http/get
   "http://example.com"

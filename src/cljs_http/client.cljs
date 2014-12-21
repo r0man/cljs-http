@@ -187,6 +187,21 @@
                   (assoc-in [:headers "content-type"] "application/x-www-form-urlencoded")))
       (client request))))
 
+(defn generate-form-data [params]
+  (let [form-data (js/FormData.)]
+    (doseq [[k v] params]
+      (.append form-data (name k) v))
+    form-data))
+
+(defn wrap-multipart-params [client]
+  (fn [{:keys [multipart-params request-method] :as request}]
+    (if (and multipart-params (#{:post :put :patch :delete} request-method))
+      (client (-> request
+                  (dissoc :multipart-params)
+                  (assoc :body (generate-form-data multipart-params))
+                  (assoc-in [:headers "content-type"] "multipart/form-data")))
+      (client request))))
+
 (defn wrap-method [client]
   (fn [req]
     (if-let [m (:method req)]
@@ -242,6 +257,7 @@
   (-> request
       wrap-accept
       wrap-form-params
+      wrap-multipart-params
       wrap-content-type
       wrap-edn-params
       wrap-edn-response
