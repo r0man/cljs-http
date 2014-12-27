@@ -1,5 +1,6 @@
 (ns cljs-http.core
   (:import [goog.net EventType XhrIo])
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.util :as util]
             [cljs.core.async :as async]))
 
@@ -17,7 +18,7 @@
 (defn request
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [request-method headers body with-credentials?] :as request}]
+  [{:keys [request-method headers body with-credentials? cancel] :as request}]
   (let [channel (async/chan)
         request-url (util/build-url request)
         method (name (or request-method :get))
@@ -41,4 +42,9 @@
                 (swap! pending-requests dissoc channel)
                 (async/close! channel)))
     (.send xhr request-url method body headers)
+    (if cancel
+      (go
+        (let [v (async/<! cancel)]
+          (if (not (.isComplete xhr))
+            (.abort xhr)))))
     channel))
