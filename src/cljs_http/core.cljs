@@ -45,6 +45,7 @@
                  (if-not (aborted? xhr)
                    (async/put! channel response))
                  (swap! pending-requests dissoc channel)
+                 (if cancel (async/close! cancel))
                  (async/close! channel))))
     (.send xhr request-url method body headers)
     (if cancel
