@@ -1,5 +1,6 @@
 (ns cljs-http.test.client
-  (:require-macros [cemerick.cljs.test :refer [is deftest testing]])
+  (:require-macros [cemerick.cljs.test :refer [is deftest testing done]]
+                   [cljs.core.async.macros :refer [go]])
   (:require [cemerick.cljs.test :as t]
             [cljs.core.async :as async]
             [cljs-http.client :as client]
@@ -129,3 +130,13 @@
     (testing "request api with middleware"
       (is (not= c (client/request request-no-chan)))
       (is (= c (client/request request-with-chan))))))
+
+(deftest ^:async test-cancel-channel
+  (let [cancel (async/chan 1)
+        request (client/request {:request-method :get :url "http://google.com" :cancel cancel})]
+    (async/close! cancel)
+    (testing "output channel is closed if request is cancelled"
+      (go
+        (let [resp (async/<! request)]
+          (is (= resp nil)))
+        (done)))))
