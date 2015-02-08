@@ -27,7 +27,7 @@
          (.setQuery query-string true))))
 
 (defn camelize
-  "Returns dash separeted string `s` in camel case."
+  "Returns dash separated string `s` in camel case."
   [s]
   (->> (split (str s) #"-")
        (map capitalize)
