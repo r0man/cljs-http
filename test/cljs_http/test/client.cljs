@@ -84,6 +84,10 @@
     (is (= "application/json" (get-in request [:headers "content-type"])))
     (is (= (util/json-encode {:a 1}) (-> request :body)))))
 
+(deftest test-wrap-default-headers
+   (let [request ((client/wrap-default-headers identity) {:default-headers {:X-Csrf-Token "abc"}})]
+    (is (= "abc" (get-in request [:default-headers :X-Csrf-Token])))))
+
 (deftest test-wrap-url
   (let [request {:request-method :get :url "http://example.com/?b=2" :query-params {:a "1"}}]
     ((client/wrap-url

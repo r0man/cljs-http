@@ -3,7 +3,8 @@
   (:require [clojure.string :refer [blank? capitalize join split lower-case]]
             [cognitect.transit :as t]
             [goog.userAgent :as agent]
-            [no.en.core :refer [base64-encode]]))
+            [no.en.core :refer [base64-encode]]
+            [camel-snake-kebab.core :refer [->HTTP-Header-Case-String]]))
 
 (defn basic-auth
   "Returns the value of the HTTP basic authentication header for
@@ -26,16 +27,12 @@
          (.setPath uri)
          (.setQuery query-string true))))
 
-(defn camelize
-  "Returns dash separated string `s` in camel case."
-  [s]
-  (->> (split (str s) #"-")
-       (map capitalize)
-       (join "-")))
+(defn clj->http-header-map
+  [m] (zipmap (map ->HTTP-Header-Case-String (keys m)) (vals m)))
 
 (defn build-headers
   "Build the headers from the map."
-  [m] (clj->js (zipmap (map camelize (keys m)) (vals m))))
+  [m] (clj->js (clj->http-header-map m)))
 
 (defn user-agent
   "Returns the user agent."

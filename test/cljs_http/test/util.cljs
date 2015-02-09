@@ -22,13 +22,6 @@
                           :uri "/continents"
                           :query-string "page=1"}))))
 
-(deftest test-camelize
-  (are [s expected]
-    (is (= expected (util/camelize s)))
-    "" ""
-    "accept" "Accept"
-    "content-type" "Content-Type"))
-
 (deftest test-transit-encode
   (are [x expected]
     (is (= expected (util/transit-encode x :json nil)))
@@ -61,6 +54,16 @@
 
 (deftest test-user-agent
   (util/user-agent))
+
+(deftest test-build-headers
+  (are [headers expected]
+    (is (= expected  (js->clj (util/build-headers headers))))
+      {:x-csrf-token  "abcd"}            {"X-Csrf-Token" "abcd"}
+      {:www-authenticate "Basic"}        {"WWW-Authenticate" "Basic"}
+      {"content-type" "application/edn"} {"Content-Type" "application/edn"}
+      {:content-type  "application/edn"} {"Content-Type" "application/edn"}
+      {:x-csrf-token  "abcd" :content-type "application/edn"}
+      {"X-Csrf-Token" "abcd" "Content-Type" "application/edn"}))
 
 (deftest test-parse-headers
   (are [headers expected]

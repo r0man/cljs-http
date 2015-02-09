@@ -18,6 +18,24 @@
 (defn- aborted? [xhr]
   (= (.getLastErrorCode xhr) goog.net.ErrorCode.ABORT))
 
+(defn apply-default-headers!
+  "Takes an XhrIo object and applies the default-headers to it."
+  [xhr headers]
+  (doseq [[h-name h-val] (util/clj->http-header-map headers)]
+    (.set (.-headers xhr) h-name h-val)))
+
+(defn build-xhr
+  "Builds an XhrIo object from the request parameters."
+  [{:keys [with-credentials? default-headers] :as request}]
+  (let [timeout (or (:timeout request) 0)
+        send-credentials (if (nil? with-credentials?)
+                           true
+                           with-credentials?)]
+    (doto (XhrIo.)
+          (apply-default-headers! default-headers)
+          (.setTimeoutInterval timeout)
+          (.setWithCredentials send-credentials))))
+
 (defn request
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
@@ -25,14 +43,8 @@
   (let [channel (async/chan)
         request-url (util/build-url request)
         method (name (or request-method :get))
-        timeout (or (:timeout request) 0)
         headers (util/build-headers headers)
-        send-credentials (if (nil? with-credentials?)
-                           true
-                           with-credentials?)
-        xhr (doto (XhrIo.)
-              (.setTimeoutInterval timeout)
-              (.setWithCredentials send-credentials))]
+        xhr (build-xhr request)]
     (swap! pending-requests assoc channel xhr)
     (.listen xhr EventType.COMPLETE
              (fn [evt]
