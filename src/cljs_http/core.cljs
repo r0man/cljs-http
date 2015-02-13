@@ -21,7 +21,8 @@
 (defn apply-default-headers!
   "Takes an XhrIo object and applies the default-headers to it."
   [xhr headers]
-  (doseq [[h-name h-val] (util/clj->http-header-map headers)]
+  (doseq [h-name (map util/camelize (keys headers))
+          h-val (vals headers)]
     (.set (.-headers xhr) h-name h-val)))
 
 (defn build-xhr

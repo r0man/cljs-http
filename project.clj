@@ -5,7 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[noencore "0.1.18"]
                  [org.clojure/clojure "1.6.0"]
-                 [camel-snake-kebab "0.3.0"]
                  [org.clojure/clojurescript "0.0-2740"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.cognitect/transit-cljs "0.8.202"]]
