@@ -101,6 +101,13 @@
     (-> #(decode-body % read-string "application/edn" (:request-method request))
         (async/map [(client request)]))))
 
+(defn wrap-default-headers
+  [client & [default-headers]]
+  (fn [request]
+    (if-let [default-headers (or (:default-headers request) default-headers)]
+      (client (assoc request :default-headers default-headers))
+      (client request))))
+
 (defn wrap-accept
   [client & [accept]]
   (fn [request]
@@ -252,7 +259,7 @@
 
 (defn wrap-request
   "Returns a batteries-included HTTP request function coresponding to the given
-   core client. See client/client."
+   core client. See client/request"
   [request]
   (-> request
       wrap-accept
@@ -270,7 +277,8 @@
       wrap-oauth
       wrap-method
       wrap-url
-      wrap-channel-from-request-map))
+      wrap-channel-from-request-map
+      wrap-default-headers))
 
 (def #^{:doc
         "Executes the HTTP request corresponding to the given map and returns the
