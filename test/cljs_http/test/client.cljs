@@ -154,3 +154,13 @@
         (let [resp (async/<! request)]
           (is (= resp nil)))
         (done)))))
+
+(deftest ^:async test-jsonp
+  (let [request (client/jsonp "http://api.openbeerdatabase.com/v1/beers.json"
+                              {:query-params {:page 2}
+                               :channel (async/chan 1 (map :body))})]
+    (testing "jsonp request"
+      (go
+        (let [resp (js->clj (async/<! request) :keywordize-keys true)]
+          (is (= (:page resp) 2)))
+        (done)))))
