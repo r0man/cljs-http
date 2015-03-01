@@ -144,3 +144,13 @@
         (let [resp (async/<! request)]
           (is (= resp nil)))
         (done)))))
+
+(deftest ^:async test-cancel-jsonp-channel
+  (let [cancel (async/chan 1)
+        request (client/request {:request-method :jsonp :url "http://api.openbeerdatabase.com/v1/breweries.json" :cancel cancel})]
+    (async/close! cancel)
+    (testing "output channel is closed if request is cancelled"
+      (go
+        (let [resp (async/<! request)]
+          (is (= resp nil)))
+        (done)))))
