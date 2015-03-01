@@ -1,5 +1,6 @@
 (ns cljs-http.core
-  (:import [goog.net EventType XhrIo])
+  (:import [goog.net EventType XhrIo]
+           [goog.net Jsonp])
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.util :as util]
             [cljs.core.async :as async]))
@@ -10,10 +11,12 @@
   "Attempt to close the given channel and abort the pending HTTP request
   with which it is associated."
   [channel]
-  (when-let [xhr (@pending-requests channel)]
+  (when-let [req (@pending-requests channel)]
     (swap! pending-requests dissoc channel)
     (async/close! channel)
-    (.abort xhr)))
+    (if (.hasOwnProperty req "abort")
+      (.abort req)
+      (.cancel (:jsonp req) (:request req)))))
 
 (defn- aborted? [xhr]
   (= (.getLastErrorCode xhr) goog.net.ErrorCode.ABORT))
@@ -37,7 +40,7 @@
           (.setTimeoutInterval timeout)
           (.setWithCredentials send-credentials))))
 
-(defn request
+(defn xhr
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
   [{:keys [request-method headers body with-credentials? cancel] :as request}]
@@ -67,3 +70,38 @@
           (if (not (.isComplete xhr))
             (.abort xhr)))))
     channel))
+
+(defn jsonp
+  "Execute the JSONP request corresponding to the given Ring request
+  map and return a core.async channel."
+  [{:keys [timeout callback-name cancel] :as request}]
+  (let [channel (async/chan)
+        jsonp (Jsonp. (util/build-url request) callback-name)]
+    (.setRequestTimeout jsonp timeout)
+    (let [req (.send jsonp nil
+                     (fn success-callback [data]
+                       (let [response {:status 200
+                                       :success true
+                                       :body (js->clj data :keywordize-keys true)}]
+                         (async/put! channel response)
+                         (swap! pending-requests dissoc channel)
+                         (if cancel (async/close! cancel))
+                         (async/close! channel)))
+                     (fn error-callback []
+                         (swap! pending-requests dissoc channel)
+                         (if cancel (async/close! cancel))
+                         (async/close! channel)))]
+      (swap! pending-requests assoc channel {:jsonp jsonp :request req})
+      (if cancel
+        (go
+          (let [v (async/<! cancel)]
+            (.cancel jsonp req)))))
+    channel))
+
+(defn request
+  "Execute the HTTP request corresponding to the given Ring request
+  map and return a core.async channel."
+  [{:keys [request-method] :as request}]
+  (if (= request-method :jsonp)
+    (jsonp request)
+    (xhr request)))

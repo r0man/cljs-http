@@ -59,6 +59,13 @@ Via Clojars: http://clojars.org/cljs-http
 ;; Pass prepared channel that will be returned,
 ;; e.g. to use a transducer.
 (http/get "http://example.com" {:channel (chan 1 (map :body))})
+
+;; JSONP
+(http/jsonp "http://example.com" {:callback-name "callback" :timeout 3000})
+;; Where `callback-name` is used to specify JSONP callback param name. Defaults to "callback".
+;; `timeout` is the length of time, in milliseconds.
+;; This channel is prepared to wait for for a request to complete.
+;; If the call is not competed within the set time span, it is assumed to have failed.
 ```
 
 ## License
