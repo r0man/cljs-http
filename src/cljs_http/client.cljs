@@ -306,6 +306,11 @@
   [url & [req]]
   (request (merge req {:method :head :url url})))
 
+(defn jsonp
+  "Like #'request, but sets the :method and :url as appropriate."
+  [url & [req]]
+  (request (merge req {:method :jsonp :url url})))
+
 (defn move
   "Like #'request, but sets the :method and :url as appropriate."
   [url & [req]]
