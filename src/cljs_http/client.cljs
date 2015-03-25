@@ -205,8 +205,7 @@
     (if (and multipart-params (#{:post :put :patch :delete} request-method))
       (client (-> request
                   (dissoc :multipart-params)
-                  (assoc :body (generate-form-data multipart-params))
-                  (assoc-in [:headers "content-type"] "multipart/form-data")))
+                  (assoc :body (generate-form-data multipart-params))))
       (client request))))
 
 (defn wrap-method [client]
