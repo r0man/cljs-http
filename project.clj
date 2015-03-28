@@ -1,4 +1,4 @@
-(defproject cljs-http "0.1.29-SNAPSHOT"
+(defproject cljs-http "0.1.29"
   :description "A ClojureScript HTTP library."
   :url "https://github.com/r0man/cljs-http"
   :license {:name "Eclipse Public License"
