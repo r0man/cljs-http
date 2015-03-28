@@ -9,9 +9,9 @@
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [com.cognitect/transit-cljs "0.8.205"]]
   :plugins [[com.cemerick/clojurescript.test "0.3.0"]
-            [lein-cljsbuild "1.0.3"]]
-  :aliases {"test-ancient" ["test"]}
-  :hooks [leiningen.cljsbuild]
+            [lein-cljsbuild "1.0.5"]]
+  :aliases {"test" ["do" "clean," "cljsbuild" "test"]
+            "test-ancient" ["test"]}
   :min-lein-version "2.0.0"
   :deploy-repositories [["releases" :clojars]]
   :cljsbuild {:builds [{:compiler {:output-to "target/testable.js"
