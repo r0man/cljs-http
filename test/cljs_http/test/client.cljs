@@ -164,3 +164,39 @@
         (let [resp (async/<! request)]
           (is (= (:page resp) 2)))
         (done)))))
+
+(deftest test-decode-body
+  (let [headers {"content-type" "application/transit+json"}
+        body "[\"^ \",\"~:a\",1]"
+        decode-fn #(util/transit-decode % :json nil)]
+    (testing "application/transit+json response"
+      (is (= {:status 200 :body {:a 1} :headers headers}
+             (client/decode-body {:status 200
+                                  :body body
+                                  :headers headers}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :get))))
+
+    (testing "text/plain response"
+      (is (= {:status 200 :body body :headers {"content-type" "text/plain"}}
+             (client/decode-body {:status 200
+                                  :body body
+                                  :headers {"content-type" "text/plain"}}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :get))))
+
+    (testing "204 status"
+      (is (= {:status 204 :body body :headers headers}
+             (client/decode-body {:status 204 :body body :headers headers}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :get))))
+
+    (testing ":head request-method"
+      (is (= {:status 200 :body body :headers headers}
+             (client/decode-body {:status 200 :body body :headers headers}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :head))))))
