@@ -265,13 +265,13 @@
       wrap-accept
       wrap-form-params
       wrap-multipart-params
-      wrap-content-type
       wrap-edn-params
       wrap-edn-response
       wrap-transit-params
       wrap-transit-response
       wrap-json-params
       wrap-json-response
+      wrap-content-type
       wrap-query-params
       wrap-basic-auth
       wrap-oauth
