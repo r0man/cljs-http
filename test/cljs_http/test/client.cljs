@@ -202,7 +202,7 @@
                                  :head))))))
 
 (deftest ^:async http-error-code
-  (testing "Unsuccessful request results in appropriate error code"
+  (testing "Successful/unsuccessful response results in appropriate :error-code"
     (let [success-req (client/get "http://httpbin.org/get")
           timeout-req (client/get "http://httpbin.org/delay/10" {:timeout 1})]
       (go
