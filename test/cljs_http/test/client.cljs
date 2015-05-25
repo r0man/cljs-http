@@ -145,9 +145,11 @@
           (is (= resp nil)))
         (done)))))
 
+;; See http://doc.jsfiddle.net/use/echo.html for details on the endpoint used
+;; for JSONP tests
 (deftest ^:async test-cancel-jsonp-channel
   (let [cancel (async/chan 1)
-        request (client/request {:request-method :jsonp :url "http://api.openbeerdatabase.com/v1/breweries.json" :cancel cancel})]
+        request (client/request {:request-method :jsonp :url "http://jsfiddle.net/echo/jsonp/" :cancel cancel})]
     (async/close! cancel)
     (testing "output channel is closed if request is cancelled"
       (go
@@ -156,13 +158,13 @@
         (done)))))
 
 (deftest ^:async test-jsonp
-  (let [request (client/jsonp "http://api.openbeerdatabase.com/v1/beers.json"
-                              {:query-params {:page 2}
+  (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
+                              {:query-params {:foo "bar"}
                                :channel (async/chan 1 (map :body))})]
     (testing "jsonp request"
       (go
         (let [resp (async/<! request)]
-          (is (= (:page resp) 2)))
+          (is (= (:foo resp) "bar")))
         (done)))))
 
 (deftest test-decode-body
