@@ -1,9 +1,10 @@
 (ns cljs-http.core
-  (:import [goog.net EventType XhrIo]
+  (:import [goog.net EventType ErrorCode XhrIo]
            [goog.net Jsonp])
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.util :as util]
-            [cljs.core.async :as async]))
+            [cljs.core.async :as async]
+            [clojure.string :as s]))
 
 (def pending-requests (atom {}))
 
@@ -40,6 +41,17 @@
           (.setTimeoutInterval timeout)
           (.setWithCredentials send-credentials))))
 
+;; Reverses the goog.net.ErrorCode constants to map to CLJS keywords
+(def error-kw
+  (let [kebabize (fn [s]
+                   (-> (s/lower-case s)
+                       (s/replace #"_" "-")))]
+    (->> (js->clj goog.net.ErrorCode)
+         (keep (fn [[code-name n]]
+                 (when (integer? n)
+                   [n (keyword (kebabize code-name))])))
+         (into {}))))
+
 (defn xhr
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
@@ -57,7 +69,9 @@
                                :success (.isSuccess target)
                                :body (.getResponseText target)
                                :headers (util/parse-headers (.getAllResponseHeaders target))
-                               :trace-redirects [request-url (.getLastUri target)]}]
+                               :trace-redirects [request-url (.getLastUri target)]
+                               :error-code (error-kw (.getLastErrorCode target))
+                               :error-text (.getLastError target)}]
                  (if-not (aborted? xhr)
                    (async/put! channel response))
                  (swap! pending-requests dissoc channel)
