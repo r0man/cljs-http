@@ -27,7 +27,7 @@
          (.setQuery query-string true))))
 
 (defn camelize
-  "Returns dash separeted string `s` in camel case."
+  "Returns dash separated string `s` in camel case."
   [s]
   (->> (split (str s) #"-")
        (map capitalize)
@@ -60,7 +60,7 @@
 (defn json-decode
   "JSON decode an object from `s`."
   [s]
-  (if-let [v (js/JSON.parse s)]
+  (if-let [v (if-not (clojure.string/blank? s) (js/JSON.parse s))]
     (js->clj v :keywordize-keys true)))
 
 (defn json-encode

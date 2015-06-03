@@ -1,7 +1,10 @@
 (ns cljs-http.test.client
-  (:require-macros [cemerick.cljs.test :refer [is deftest testing]])
+  (:require-macros [cemerick.cljs.test :refer [is deftest testing done]]
+                   [cljs.core.async.macros :refer [go]])
   (:require [cemerick.cljs.test :as t]
+            [cljs.core.async :as async]
             [cljs-http.client :as client]
+            [cljs-http.core :as core]
             [cljs-http.util :as util]))
 
 (deftest test-parse-query-params
@@ -81,6 +84,10 @@
     (is (= "application/json" (get-in request [:headers "content-type"])))
     (is (= (util/json-encode {:a 1}) (-> request :body)))))
 
+(deftest test-wrap-default-headers
+   (let [request ((client/wrap-default-headers identity) {:default-headers {"X-Csrf-Token" "abc"}})]
+    (is (= "abc" (get-in request [:default-headers "X-Csrf-Token"])))))
+
 (deftest test-wrap-url
   (let [request {:request-method :get :url "http://example.com/?b=2" :query-params {:a "1"}}]
     ((client/wrap-url
@@ -119,3 +126,89 @@
           response ((client/wrap-form-params identity) request)]
       (is (= "untouched" (:body response)))
       (is (not (contains? (:headers response) "content-type"))))))
+
+(deftest test-custom-channel
+  (let [c (async/chan 1)
+        request-no-chan {:request-method :get :url "http://localhost/"}
+        request-with-chan {:request-method :get :url "http://localhost/" :channel c}]
+    (testing "request api with middleware"
+      (is (not= c (client/request request-no-chan)))
+      (is (= c (client/request request-with-chan))))))
+
+(deftest ^:async test-cancel-channel
+  (let [cancel (async/chan 1)
+        request (client/request {:request-method :get :url "http://google.com" :cancel cancel})]
+    (async/close! cancel)
+    (testing "output channel is closed if request is cancelled"
+      (go
+        (let [resp (async/<! request)]
+          (is (= resp nil)))
+        (done)))))
+
+;; See http://doc.jsfiddle.net/use/echo.html for details on the endpoint used
+;; for JSONP tests
+(deftest ^:async test-cancel-jsonp-channel
+  (let [cancel (async/chan 1)
+        request (client/request {:request-method :jsonp :url "http://jsfiddle.net/echo/jsonp/" :cancel cancel})]
+    (async/close! cancel)
+    (testing "output channel is closed if request is cancelled"
+      (go
+        (let [resp (async/<! request)]
+          (is (= resp nil)))
+        (done)))))
+
+(deftest ^:async test-jsonp
+  (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
+                              {:query-params {:foo "bar"}
+                               :channel (async/chan 1 (map :body))})]
+    (testing "jsonp request"
+      (go
+        (let [resp (async/<! request)]
+          (is (= (:foo resp) "bar")))
+        (done)))))
+
+(deftest test-decode-body
+  (let [headers {"content-type" "application/transit+json"}
+        body "[\"^ \",\"~:a\",1]"
+        decode-fn #(util/transit-decode % :json nil)]
+    (testing "application/transit+json response"
+      (is (= {:status 200 :body {:a 1} :headers headers}
+             (client/decode-body {:status 200
+                                  :body body
+                                  :headers headers}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :get))))
+
+    (testing "text/plain response"
+      (is (= {:status 200 :body body :headers {"content-type" "text/plain"}}
+             (client/decode-body {:status 200
+                                  :body body
+                                  :headers {"content-type" "text/plain"}}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :get))))
+
+    (testing "204 status"
+      (is (= {:status 204 :body body :headers headers}
+             (client/decode-body {:status 204 :body body :headers headers}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :get))))
+
+    (testing ":head request-method"
+      (is (= {:status 200 :body body :headers headers}
+             (client/decode-body {:status 200 :body body :headers headers}
+                                 decode-fn
+                                 "application/transit+json"
+                                 :head))))))
+
+(deftest ^:async http-error-code
+  (testing "Successful/unsuccessful response results in appropriate :error-code"
+    (let [success-req (client/get "http://httpbin.org/get")
+          timeout-req (client/get "http://httpbin.org/delay/10" {:timeout 1})]
+      (go
+        (is (= :no-error (:error-code (<! success-req))))
+        (is (= :timeout  (:error-code (<! timeout-req))))
+        (done)))))
+
