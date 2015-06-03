@@ -1,6 +1,7 @@
 (ns cljs-http.core
   (:import [goog.net EventType ErrorCode XhrIo]
-           [goog.net Jsonp])
+           [goog.net Jsonp]
+           [goog.net.XhrIo ResponseType])
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.util :as util]
             [cljs.core.async :as async]
@@ -31,7 +32,8 @@
 
 (defn build-xhr
   "Builds an XhrIo object from the request parameters."
-  [{:keys [with-credentials? default-headers] :as request}]
+  [{:keys [with-credentials? response-type default-headers] :as request
+    :or {response-type goog.net.XhrIo.ResponseType.DEFAULT}}]
   (let [timeout (or (:timeout request) 0)
         send-credentials (if (nil? with-credentials?)
                            true
@@ -39,7 +41,8 @@
     (doto (XhrIo.)
           (apply-default-headers! default-headers)
           (.setTimeoutInterval timeout)
-          (.setWithCredentials send-credentials))))
+          (.setWithCredentials send-credentials)
+          (.setResponseType response-type))))
 
 ;; Reverses the goog.net.ErrorCode constants to map to CLJS keywords
 (def error-kw
@@ -55,7 +58,7 @@
 (defn xhr
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [request-method headers body with-credentials? cancel] :as request}]
+  [{:keys [request-method headers body response-type with-credentials? cancel] :as request}]
   (let [channel (async/chan)
         request-url (util/build-url request)
         method (name (or request-method :get))
@@ -67,7 +70,9 @@
                (let [target (.-target evt)
                      response {:status (.getStatus target)
                                :success (.isSuccess target)
-                               :body (.getResponseText target)
+                               :body (if response-type
+                                       (.getResponse target)
+                                       (.getResponseText target))
                                :headers (util/parse-headers (.getAllResponseHeaders target))
                                :trace-redirects [request-url (.getLastUri target)]
                                :error-code (error-kw (.getLastErrorCode target))
