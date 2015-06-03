@@ -7,7 +7,7 @@
                  [org.clojure/clojure "1.7.0-RC1"]
                  [org.clojure/clojurescript "0.0-3165" :scope "provided"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [com.cognitect/transit-cljs "0.8.205"]]
+                 [com.cognitect/transit-cljs "0.8.220"]]
   :plugins [[com.cemerick/clojurescript.test "0.3.3"]
             [lein-cljsbuild "1.0.6"]]
   :aliases {"test" ["do" "clean," "cljsbuild" "test"]
