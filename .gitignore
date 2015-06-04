@@ -20,3 +20,6 @@
 /pom.xml.asc
 /.repl
 /.nrepl-port
+*.iml
+/.idea
+/.cljs_rhino_repl
