@@ -41,16 +41,18 @@
           (.setTimeoutInterval timeout)
           (.setWithCredentials send-credentials))))
 
-;; Reverses the goog.net.ErrorCode constants to map to CLJS keywords
+;; goog.net.ErrorCode constants to CLJS keywords
 (def error-kw
-  (let [kebabize (fn [s]
-                   (-> (s/lower-case s)
-                       (s/replace #"_" "-")))]
-    (->> (js->clj goog.net.ErrorCode)
-         (keep (fn [[code-name n]]
-                 (when (integer? n)
-                   [n (keyword (kebabize code-name))])))
-         (into {}))))
+  {0 :no-error
+   1 :access-denied
+   2 :file-not-found
+   3 :ff-silent-error
+   4 :custom-error
+   5 :exception
+   6 :http-error
+   7 :abort
+   8 :timeout
+   9 :offline})
 
 (defn xhr
   "Execute the HTTP request corresponding to the given Ring request
