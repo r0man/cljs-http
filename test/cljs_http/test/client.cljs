@@ -212,3 +212,14 @@
         (is (= :timeout  (:error-code (<! timeout-req))))
         (done)))))
 
+(deftest ^:async response-type
+  (let [request (client/get "http://httpbin.org/image/png"
+                            {:response-type :array-buffer})]
+    (testing "Getting and reading arraybuffer response"
+      (go
+        (let [resp (async/<! request)
+              body (js/Uint8Array. (:body resp))
+              sign (array-seq (.subarray body 0 8))]
+          ;; PNG image signature
+          (is (= [137 80 78 71 13 10 26 10] sign))
+          (done))))))

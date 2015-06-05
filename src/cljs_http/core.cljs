@@ -29,15 +29,28 @@
           h-val (vals headers)]
     (.set (.-headers xhr) h-name h-val)))
 
+(defn apply-response-type!
+  "Takes an XhrIo object and sets response-type if not nil."
+  [xhr response-type]
+  (.setResponseType xhr
+   (case response-type
+     :array-buffer XhrIo.ResponseType.ARRAY_BUFFER
+     :blob XhrIo.ResponseType.BLOB
+     :document XhrIo.ResponseType.DOCUMENT
+     :text XhrIo.ResponseType.TEXT
+     :default XhrIo.ResponseType.DEFAULT
+     nil XhrIo.ResponseType.DEFAULT)))
+
 (defn build-xhr
   "Builds an XhrIo object from the request parameters."
-  [{:keys [with-credentials? default-headers] :as request}]
+  [{:keys [with-credentials? default-headers response-type] :as request}]
   (let [timeout (or (:timeout request) 0)
         send-credentials (if (nil? with-credentials?)
                            true
                            with-credentials?)]
     (doto (XhrIo.)
           (apply-default-headers! default-headers)
+          (apply-response-type! response-type)
           (.setTimeoutInterval timeout)
           (.setWithCredentials send-credentials))))
 
@@ -69,7 +82,7 @@
                (let [target (.-target evt)
                      response {:status (.getStatus target)
                                :success (.isSuccess target)
-                               :body (.getResponseText target)
+                               :body (.getResponse target)
                                :headers (util/parse-headers (.getAllResponseHeaders target))
                                :trace-redirects [request-url (.getLastUri target)]
                                :error-code (error-kw (.getLastErrorCode target))
