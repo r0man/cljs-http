@@ -127,6 +127,13 @@
       (is (= "untouched" (:body response)))
       (is (not (contains? (:headers response) "content-type"))))))
 
+(defn wrap-alternative-headers
+  [client & _]
+  (fn [request]
+    (if-let [alternative-headers (:alternative-headers request)]
+      (client (assoc (dissoc request :alternative-headers) :headers (merge (:headers request) alternative-headers)))
+      (client request))))
+
 (deftest test-custom-channel
   (let [c (async/chan 1)
         request-no-chan {:request-method :get :url "http://localhost/"}
