@@ -56,7 +56,7 @@ Via Clojars: http://clojars.org/cljs-http
   {:basic-auth {:username "hello" :password "world"}})
 
 ;; Override headers
-(http/post "http://example.com" {:json-params {:key1 {:foo :bar} :alternative-headers {"content-type" "alternative-content-type"}}})
+(http/post "http://example.com" {:json-params {:foo :bar} :alternative-headers {"content-type" "alternative-content-type"}})
 ;; in this case the "content-type" header that used to be "application/json" will be "alternative-content-type"
 
 ;; Pass prepared channel that will be returned,
