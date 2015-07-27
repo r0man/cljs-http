@@ -127,6 +127,16 @@
       (is (= "untouched" (:body response)))
       (is (not (contains? (:headers response) "content-type"))))))
 
+(deftest test-wrap-alternative-headers
+  (testing "With alternative headers"
+    (let [alternative-content-type "application/alt-content-type"
+          request {
+            :headers {"content-type" "application/json"}
+            :alternative-headers {"content-type" alternative-content-type}}
+          response ((client/wrap-alternative-headers identity) request)]
+      (is (= ((:headers response) "content-type") alternative-content-type))
+      (is (not (contains? response :alternative-headers))))))
+
 (deftest test-custom-channel
   (let [c (async/chan 1)
         request-no-chan {:request-method :get :url "http://localhost/"}

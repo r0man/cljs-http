@@ -109,6 +109,16 @@
       (client (assoc request :default-headers default-headers))
       (client request))))
 
+(defn wrap-alternative-headers
+  [client & _]
+  (fn [request]
+    (if-let [alternative-headers (:alternative-headers request)]
+      (-> request
+          (dissoc :alternative-headers)
+          (assoc :headers (merge (:headers request) alternative-headers))
+          (client))
+      (client request))))
+
 (defn wrap-accept
   [client & [accept]]
   (fn [request]
@@ -262,6 +272,7 @@
    core client. See client/request"
   [request]
   (-> request
+      wrap-alternative-headers
       wrap-accept
       wrap-form-params
       wrap-multipart-params

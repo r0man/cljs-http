@@ -55,6 +55,10 @@ Via Clojars: http://clojars.org/cljs-http
   "http://example.com"
   {:basic-auth {:username "hello" :password "world"}})
 
+;; Override headers
+(http/post "http://example.com" {:json-params {:foo :bar} :alternative-headers {"content-type" "alternative-content-type"}})
+;; in this case the "content-type" header that used to be "application/json" will be "alternative-content-type"
+
 ;; Pass prepared channel that will be returned,
 ;; e.g. to use a transducer.
 (http/get "http://example.com" {:channel (chan 1 (map :body))})
