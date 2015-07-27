@@ -127,12 +127,15 @@
       (is (= "untouched" (:body response)))
       (is (not (contains? (:headers response) "content-type"))))))
 
-(defn wrap-alternative-headers
-  [client & _]
-  (fn [request]
-    (if-let [alternative-headers (:alternative-headers request)]
-      (client (assoc (dissoc request :alternative-headers) :headers (merge (:headers request) alternative-headers)))
-      (client request))))
+(deftest test-wrap-alternative-headers
+  (testing "With alternative headers"
+    (let [alternative-content-type "application/alt-content-type"
+          request {
+            :headers {"content-type" "application/json"}
+            :alternative-headers {"content-type" alternative-content-type}}
+          response ((client/wrap-alternative-headers identity) request)]
+      (is (= ((:headers response) "content-type") alternative-content-type))
+      (is (not (contains? response :alternative-headers))))))
 
 (deftest test-custom-channel
   (let [c (async/chan 1)
