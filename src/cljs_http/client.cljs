@@ -89,10 +89,11 @@
   [client]
   (fn [request]
     (if-let [params (:edn-params request)]
-      (-> (dissoc request :edn-params)
-          (assoc :body (pr-str params))
-          (assoc-in [:headers "content-type"] "application/edn")
-          (client))
+      (let [headers (merge {"content-type" "application/edn"} (:headers request))]
+        (-> (dissoc request :edn-params)
+            (assoc :body (pr-str params))
+            (assoc :headers headers)
+            (client)))
       (client request))))
 
 (defn wrap-edn-response
@@ -141,10 +142,11 @@
   (fn [request]
     (if-let [params (:transit-params request)]
       (let [{:keys [encoding encoding-opts]} (merge default-transit-opts
-                                                    (:transit-opts request))]
+                                                    (:transit-opts request))
+            headers (merge {"content-type" "application/transit+json"} (:headers request))]
         (-> (dissoc request :transit-params)
             (assoc :body (util/transit-encode params encoding encoding-opts))
-            (assoc-in [:headers "content-type"] "application/transit+json")
+            (assoc :headers headers)
             (client)))
       (client request))))
 
@@ -165,10 +167,11 @@
   [client]
   (fn [request]
     (if-let [params (:json-params request)]
-      (-> (dissoc request :json-params)
-          (assoc :body (util/json-encode params))
-          (assoc-in [:headers "content-type"] "application/json")
-          (client))
+      (let [headers (merge {"content-type" "application/json"} (:headers request))]
+        (-> (dissoc request :json-params)
+            (assoc :body (util/json-encode params))
+            (assoc :headers headers)
+            (client)))
       (client request))))
 
 (defn wrap-json-response
@@ -187,12 +190,13 @@
       (client req))))
 
 (defn wrap-form-params [client]
-  (fn [{:keys [form-params request-method] :as request}]
+  (fn [{:keys [form-params request-method headers] :as request}]
     (if (and form-params (#{:post :put :patch :delete} request-method))
-      (client (-> request
-                  (dissoc :form-params)
-                  (assoc :body (generate-query-string form-params))
-                  (assoc-in [:headers "content-type"] "application/x-www-form-urlencoded")))
+      (let [headers (merge {"content-type" "application/x-www-form-urlencoded"} headers)]
+        (client (-> request
+                    (dissoc :form-params)
+                    (assoc :body (generate-query-string form-params))
+                    (assoc :headers headers))))
       (client request))))
 
 (defn generate-form-data [params]

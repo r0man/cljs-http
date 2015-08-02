@@ -84,6 +84,19 @@
     (is (= "application/json" (get-in request [:headers "content-type"])))
     (is (= (util/json-encode {:a 1}) (-> request :body)))))
 
+(deftest test-override-headers
+  (let [content-type "application/test"
+        request ((client/wrap-json-params identity) {:json-params {:a 1}})
+        edn-request ((client/wrap-edn-params identity) {:edn-params {:a 1} :headers {"content-type" content-type}})
+        transit-request ((client/wrap-transit-params identity) {:transit-params {:a 1} :headers {"content-type" content-type}})
+        json-request ((client/wrap-json-params identity) {:json-params {:a 1} :headers {"content-type" content-type}})
+        form-request ((client/wrap-form-params identity) {:form-params {:a 1} :headers {"content-type" content-type}})]
+    (is (= "application/json" (get-in request [:headers "content-type"])))
+    (is (= content-type (get-in edn-request [:headers "content-type"])))
+    (is (= content-type (get-in transit-request [:headers "content-type"])))
+    (is (= content-type (get-in json-request [:headers "content-type"])))
+    (is (= content-type (get-in form-request [:headers "content-type"])))))
+
 (deftest test-wrap-default-headers
    (let [request ((client/wrap-default-headers identity) {:default-headers {"X-Csrf-Token" "abc"}})]
     (is (= "abc" (get-in request [:default-headers "X-Csrf-Token"])))))
