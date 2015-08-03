@@ -14,59 +14,88 @@ Via Clojars: http://clojars.org/cljs-http
 
 ## Usage
 
+#### Require:
+
 ```clojure
 (ns example.core
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.client :as http]
             [cljs.core.async :refer [<!]]))
+```
 
-(go (let [response (<! (http/get "https://api.github.com/users" {:with-credentials? false
-                                                                 :query-params {"since" 135}}))]
+### Async response handling:
+The http functions will return a channel:
+```clojure
+(go (let [response (<! (http/get "https://api.github.com/users" {:with-credentials? false}
+                                                                :query-params {"since" 135}}))]
       (prn (:status response))
       (prn (map :login (:body response)))))
+```
 
-;; POSTing automatically sets Content-Type header and serializes
+You can pass a channel for the result to be written on.
+This is usefull when using a transducer:
+```clojure
+(http/get "http://example.com" {:channel (chan 1 (map :body))})
+```
+
+### Post
+
+POSTing automatically sets Content-Type header and serializes
+
+You can send the body params in mutiple formats:
+
+```clojure
 (http/post "http://example.com" {:edn-params {:foo :bar}})
 
-;; JSON is auto-converted via `cljs.core/clj->js`
 (http/post "http://example.com" {:json-params {:foo :bar}})
+;;(JSON is auto-converted via `cljs.core/clj->js`)
 
-;; POSTing JSON in verbose Transit format
 (http/post "http://example.com" {:transit-params {:key1 "value1" :key2 "value2"}})
 
-;; Form parameters in a POST request (simple)
 (http/post "http://example.com" {:form-params {:key1 "value1" :key2 "value2"}})
+```
 
-;; Form parameters in a POST request (array of values)
+
+**To send form parameters (an array of values):**
+```clojure
 (http/post "http://example.com" {:form-params {:key1 [1 2 3] :key2 "value2"}})
+```
 
-;; Multipart parameters in a POST request to upload file
+
+**To upload a  file using Multipart parameters:**
+```clojure
 (http/post "http://example.com" {:multipart-params {:key1 "value1" :my-file my-file}})
-;; where `my-file` can one of these:
-;; - a Blob instance, eg:
-;; (let [my-file (js/Blob. #js ["<h1>Hello</h1>"] #js {:type "text/html})] ...)
-;; - a File instance, eg:
-;; HTML: <input id="my-file" type="file">
-;; (let [my-file (-> (.getElementById js/document "my-file")
-;;                   .-files first)]
-;;   ...)
+```
+Where `my-file` can be one of:
+- a Blob instance, eg:
+     ```clojure
+     (let [my-file (js/Blob. #js ["<h1>Hello</h1>"] #js {:type "text/html})] ...)
+     ```
+     
+- a File instance, eg:
+    ```clojure
+     HTML: <input id="my-file" type="file">
+     (let [my-file (-> (.getElementById js/document "my-file")
+                       .-files first)]
+                       ...)
+     ```
 
-;; HTTP Basic Authentication
+### HTTP Basic Authentication
+```clojure
 (http/get
   "http://example.com"
   {:basic-auth {:username "hello" :password "world"}})
+  ```
 
-;; Pass prepared channel that will be returned,
-;; e.g. to use a transducer.
-(http/get "http://example.com" {:channel (chan 1 (map :body))})
-
-;; JSONP
+### JSONP
+```clojure
 (http/jsonp "http://example.com" {:callback-name "callback" :timeout 3000})
-;; Where `callback-name` is used to specify JSONP callback param name. Defaults to "callback".
-;; `timeout` is the length of time, in milliseconds.
-;; This channel is prepared to wait for for a request to complete.
-;; If the call is not competed within the set time span, it is assumed to have failed.
 ```
+Where `callback-name` is used to specify JSONP callback param name. Defaults to "callback".
+`timeout` is the length of time, in milliseconds.
+This channel is prepared to wait for for a request to complete.
+If the call is not competed within the set time span, it is assumed to have failed.
+
 
 ## License
 
