@@ -80,6 +80,10 @@ Where `my-file` can be one of:
                        ...)
      ```
 
+If you want to set the name of the file in the request
+(https://developer.mozilla.org/en-US/docs/Web/API/FormData/append#Syntax),
+simply set my-file to be a vector: `{:myfile [value filename]}`.
+
 ### HTTP Basic Authentication
 ```clojure
 (http/get
