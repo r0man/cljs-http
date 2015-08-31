@@ -64,7 +64,7 @@ You can send the body params in mutiple formats:
 
 **To upload a  file using Multipart parameters:**
 ```clojure
-(http/post "http://example.com" {:multipart-params [["key1 "value1"] [my-file my-file]])
+(http/post "http://example.com" {:multipart-params [["key1" "value1"] ["my-file" my-file]])
 ```
 Where `my-file` can be one of:
 - a Blob instance, eg:
@@ -82,7 +82,7 @@ Where `my-file` can be one of:
 
 If you want to set the name of the file in the request
 (https://developer.mozilla.org/en-US/docs/Web/API/FormData/append#Syntax),
-simply set my-file to be a vector: `[myfile [value filename]]`.
+simply set my-file to be a vector: `["myfile" [value filename]]`.
 
 ### HTTP Basic Authentication
 ```clojure
