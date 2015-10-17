@@ -27,9 +27,10 @@ Via Clojars: http://clojars.org/cljs-http
 The http functions will return a channel:
 ```clojure
 (go (let [response (<! (http/get "https://api.github.com/users" {:with-credentials? false}
-                                                                :query-params {"since" 135}}))]
+                                                                :query-params {"since" 135}))]
       (prn (:status response))
       (prn (map :login (:body response)))))
+
 ```
 
 You can pass a channel for the result to be written on.
