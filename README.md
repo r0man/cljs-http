@@ -1,6 +1,6 @@
 # cljs-http
   [![Build Status](https://travis-ci.org/r0man/cljs-http.png)](https://travis-ci.org/r0man/cljs-http)
-  [![Dependencies Status](http://jarkeeper.com/r0man/cljs-http/status.png)](http://jarkeeper.com/r0man/cljs-http)
+  [![Dependencies Status](https://jarkeeper.com/r0man/cljs-http/status.svg)](http://jarkeeper.com/r0man/cljs-http)
 
 A ClojureScript HTTP library.
 
