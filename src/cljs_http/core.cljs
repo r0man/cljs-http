@@ -25,9 +25,11 @@
 (defn apply-default-headers!
   "Takes an XhrIo object and applies the default-headers to it."
   [xhr headers]
-  (doseq [h-name (map util/camelize (keys headers))
-          h-val (vals headers)]
-    (.set (.-headers xhr) h-name h-val)))
+  (let [formatted-h (zipmap (map util/camelize (keys headers)) (vals headers))]
+    (dorun
+      (map (fn [[k v]]
+             (.set (.-headers xhr) k v))
+           formatted-h))))
 
 (defn apply-response-type!
   "Takes an XhrIo object and sets response-type if not nil."
