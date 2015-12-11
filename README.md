@@ -26,8 +26,8 @@ Via Clojars: http://clojars.org/cljs-http
 ### Async response handling:
 The http functions will return a channel:
 ```clojure
-(go (let [response (<! (http/get "https://api.github.com/users" {:with-credentials? false}
-                                                                :query-params {"since" 135}))]
+(go (let [response (<! (http/get "https://api.github.com/users" {:with-credentials? false
+                                                                 :query-params {"since" 135}}))]
       (prn (:status response))
       (prn (map :login (:body response)))))
 
