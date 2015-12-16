@@ -105,7 +105,9 @@
 (defn jsonp
   "Execute the JSONP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [timeout callback-name cancel] :as request}]
+  [{:keys [timeout callback-name cancel keywordize-keys?]
+    :or {keywordize-keys? true}
+    :as request}]
   (let [channel (async/chan)
         jsonp (Jsonp. (util/build-url request) callback-name)]
     (.setRequestTimeout jsonp timeout)
@@ -113,7 +115,7 @@
                      (fn success-callback [data]
                        (let [response {:status 200
                                        :success true
-                                       :body (js->clj data :keywordize-keys true)}]
+                                       :body (js->clj data :keywordize-keys keywordize-keys?)}]
                          (async/put! channel response)
                          (swap! pending-requests dissoc channel)
                          (if cancel (async/close! cancel))
