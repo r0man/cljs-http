@@ -180,6 +180,17 @@
           (is (= (:foo resp) "bar")))
         (done)))))
 
+(deftest ^:async test-keywordize-jsonp
+  (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
+                              {:keywordize-keys? false
+                               :query-params {:foo ""}
+                               :channel (async/chan 1 (map :body))})]
+    (testing "JSON-P response keys aren't converted to keywords"
+      (go
+        (let [resp (async/<! request)]
+          (is (every? string? (keys resp))))
+        (done)))))
+
 (deftest test-decode-body
   (let [headers {"content-type" "application/transit+json"}
         body "[\"^ \",\"~:a\",1]"
