@@ -1,11 +1,10 @@
-(ns cljs-http.test.client
-  (:require-macros [cemerick.cljs.test :refer [is deftest testing done]]
-                   [cljs.core.async.macros :refer [go]])
-  (:require [cemerick.cljs.test :as t]
-            [cljs.core.async :as async]
+(ns cljs-http.client-test
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [cljs.core.async :as async]
             [cljs-http.client :as client]
             [cljs-http.core :as core]
-            [cljs-http.util :as util]))
+            [cljs-http.util :as util]
+            [cljs.test :refer-macros [async are is deftest testing]]))
 
 (deftest test-parse-query-params
   (is (nil? (client/parse-query-params nil)))
@@ -98,7 +97,7 @@
     (is (= content-type (get-in form-request [:headers "content-type"])))))
 
 (deftest test-wrap-default-headers
-   (let [request ((client/wrap-default-headers identity) {:default-headers {"X-Csrf-Token" "abc"}})]
+  (let [request ((client/wrap-default-headers identity) {:default-headers {"X-Csrf-Token" "abc"}})]
     (is (= "abc" (get-in request [:default-headers "X-Csrf-Token"])))))
 
 (deftest test-wrap-url
@@ -153,10 +152,11 @@
         request (client/request {:request-method :get :url "http://google.com" :cancel cancel})]
     (async/close! cancel)
     (testing "output channel is closed if request is cancelled"
-      (go
-        (let [resp (async/<! request)]
-          (is (= resp nil)))
-        (done)))))
+      (async done
+        (go
+          (let [resp (async/<! request)]
+            (is (= resp nil)))
+          (done))))))
 
 ;; See http://doc.jsfiddle.net/use/echo.html for details on the endpoint used
 ;; for JSONP tests
@@ -165,20 +165,22 @@
         request (client/request {:request-method :jsonp :url "http://jsfiddle.net/echo/jsonp/" :cancel cancel})]
     (async/close! cancel)
     (testing "output channel is closed if request is cancelled"
-      (go
-        (let [resp (async/<! request)]
-          (is (= resp nil)))
-        (done)))))
+      (async done
+        (go
+          (let [resp (async/<! request)]
+            (is (= resp nil)))
+          (done))))))
 
 (deftest ^:async test-jsonp
   (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
                               {:query-params {:foo "bar"}
                                :channel (async/chan 1 (map :body))})]
     (testing "jsonp request"
-      (go
-        (let [resp (async/<! request)]
-          (is (= (:foo resp) "bar")))
-        (done)))))
+      (async done
+        (go
+          (let [resp (async/<! request)]
+            (is (= (:foo resp) "bar")))
+          (done))))))
 
 (deftest ^:async test-keywordize-jsonp
   (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
@@ -186,10 +188,11 @@
                                :query-params {:foo ""}
                                :channel (async/chan 1 (map :body))})]
     (testing "JSON-P response keys aren't converted to keywords"
-      (go
-        (let [resp (async/<! request)]
-          (is (every? string? (keys resp))))
-        (done)))))
+      (async done
+        (go
+          (let [resp (async/<! request)]
+            (is (every? string? (keys resp))))
+          (done))))))
 
 (deftest test-decode-body
   (let [headers {"content-type" "application/transit+json"}
@@ -231,19 +234,21 @@
   (testing "Successful/unsuccessful response results in appropriate :error-code"
     (let [success-req (client/get "http://httpbin.org/get")
           timeout-req (client/get "http://httpbin.org/delay/10" {:timeout 1})]
-      (go
-        (is (= :no-error (:error-code (<! success-req))))
-        (is (= :timeout  (:error-code (<! timeout-req))))
-        (done)))))
+      (async done
+        (go
+          (is (= :no-error (:error-code (<! success-req))))
+          (is (= :timeout  (:error-code (<! timeout-req))))
+          (done))))))
 
 (deftest ^:async response-type
   (let [request (client/get "http://httpbin.org/image/png"
                             {:response-type :array-buffer})]
     (testing "Getting and reading arraybuffer response"
-      (go
-        (let [resp (async/<! request)
-              body (js/Uint8Array. (:body resp))
-              sign (array-seq (.subarray body 0 8))]
-          ;; PNG image signature
-          (is (= [137 80 78 71 13 10 26 10] sign))
-          (done))))))
+      (async done
+        (go
+          (let [resp (async/<! request)
+                body (js/Uint8Array. (:body resp))
+                sign (array-seq (.subarray body 0 8))]
+            ;; PNG image signature
+            (is (= [137 80 78 71 13 10 26 10] sign))
+            (done)))))))
