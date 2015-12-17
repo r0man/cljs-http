@@ -1,7 +1,6 @@
-(ns cljs-http.test.util
-  (:require-macros [cemerick.cljs.test :refer [are is deftest]])
-  (:require [cemerick.cljs.test :as t]
-            [cljs-http.util :as util]))
+(ns cljs-http.util-test
+  (:require [cljs-http.util :as util]
+            [cljs.test :refer-macros [are is deftest]]))
 
 (deftest test-basic-auth
   (is (nil? (util/basic-auth nil)))
