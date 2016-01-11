@@ -90,8 +90,18 @@ simply set my-file to be a vector: `["myfile" [value filename]]`.
 (http/get
   "http://example.com"
   {:basic-auth {:username "hello" :password "world"}})
-  ```
+```
 
+### Upload/Download progress monitoring
+```clojure
+(let [progress-channel (async/chan)]
+  (http/post "http://example.com" {:multipart-params [["key1" "value1"] ["my-file" my-file]] :progress progress-chan}))
+```
+The progress-channel will receive progress events: {:directon dir :loaded uploaded_or_downloaded :total size}
+- :direction is :upload or :download
+- in some cases :total can be missing
+
+  
 ### JSONP
 ```clojure
 (http/jsonp "http://example.com" {:callback-name "callback" :timeout 3000})
