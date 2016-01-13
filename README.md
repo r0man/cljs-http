@@ -1,4 +1,4 @@
-# cljs-http
+	# cljs-http
   [![Build Status](https://travis-ci.org/r0man/cljs-http.svg)](https://travis-ci.org/r0man/cljs-http)
   [![Dependencies Status](https://jarkeeper.com/r0man/cljs-http/status.svg)](http://jarkeeper.com/r0man/cljs-http)
 
@@ -34,7 +34,7 @@ The http functions will return a channel:
 ```
 
 You can pass a channel for the result to be written on.
-This is usefull when using a transducer:
+This is useful when using a transducer:
 ```clojure
 (http/get "http://example.com" {:channel (chan 1 (map :body))})
 ```
