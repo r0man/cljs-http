@@ -5,7 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[noencore "0.2.1"]
                  [org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.7.170" :scope "provided"]
+                 [org.clojure/clojurescript "1.8.40" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
                  [com.cognitect/transit-cljs "0.8.237"]]
   :plugins [[lein-cljsbuild "1.1.2"]
