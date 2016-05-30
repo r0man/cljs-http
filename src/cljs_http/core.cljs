@@ -72,7 +72,7 @@
 (defn xhr
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [request-method headers body with-credentials? cancel] :as request}]
+  [{:keys [request-method headers body with-credentials? cancel progress] :as request}]
   (let [channel (async/chan)
         request-url (util/build-url request)
         method (name (or request-method :get))
@@ -94,6 +94,16 @@
                  (swap! pending-requests dissoc channel)
                  (if cancel (async/close! cancel))
                  (async/close! channel))))
+
+    (when progress
+      (let [listener (fn [direction evt]
+                       (async/put! progress (merge {:direction direction :loaded (.-loaded evt)}
+                                                   (if (.-lengthComputable evt) {:total (.-total evt)}))))]
+        (doto xhr
+          (.setProgressEventsEnabled true)
+          (.listen EventType.UPLOAD_PROGRESS (partial listener :upload))
+          (.listen EventType.PROGRESS (partial listener :download)))))
+
     (.send xhr request-url method body headers)
     (if cancel
       (go
