@@ -102,7 +102,7 @@
         (doto xhr
           (.setProgressEventsEnabled true)
           (.listen EventType.UPLOAD_PROGRESS (partial listener :upload))
-          (.listen EventType.PROGRESS (partial listener :download)))))
+          (.listen EventType.DOWNLOAD_PROGRESS (partial listener :download)))))
 
     (.send xhr request-url method body headers)
     (if cancel
