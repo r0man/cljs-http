@@ -194,6 +194,21 @@
             (is (every? string? (keys resp))))
           (done))))))
 
+#_(deftest ^:async test-progress-channel-returns-progress
+  (let [progress (async/chan 1)
+        _ (client/post "http://www.google.com"
+                       {:json-params {:foo :bar}
+                        :progress    progress})]
+    (testing "progress channel returns progress"
+      (async done
+        (go
+          (let [return (async/<! progress)]
+            (is (map? return))
+            (is (= :upload (:direction return)))
+            (is (contains? return :total))
+            (is (contains? return :loaded)))
+          (done))))))
+
 (deftest test-decode-body
   (let [headers {"content-type" "application/transit+json"}
         body "[\"^ \",\"~:a\",1]"

@@ -106,6 +106,17 @@
       (http/get "http://example.com" {:basic-auth {:username "hello" :password "world"}})
     #+END_SRC
 
+*** Upload/Download progress monitoring
+
+    #+BEGIN_SRC clojure
+    (let [progress-channel (async/chan)]
+      (http/post "http://example.com" {:multipart-params [["key1" "value1"] ["my-file" my-file]] :progress progress-chan}))
+    #+END_SRC
+
+    The progress-channel will receive progress events: {:directon dir :loaded uploaded_or_downloaded :total size}
+    - :direction is :upload or :download
+    - in some cases :total can be missing
+
 *** JSONP
 
     #+BEGIN_SRC clojure
