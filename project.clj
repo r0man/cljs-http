@@ -3,7 +3,7 @@
   :url "https://github.com/r0man/cljs-http"
   :license {:name "Eclipse Public License"
             :url "https://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[noencore "0.2.1"]
+  :dependencies [[noencore "0.3.3"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.36" :scope "provided"]
                  [org.clojure/core.async "0.2.374"]
