@@ -71,7 +71,7 @@
     To upload a file using Multipart parameters:
 
     #+BEGIN_SRC clojure
-    (http/post "http://example.com" {:multipart-params [["key1" "value1"] ["my-file" my-file]])
+    (http/post "http://example.com" {:multipart-params [["key1" "value1"] ["my-file" my-file]]})
     #+END_SRC
 
     Where =my-file= can be a JavaScript [[https://developer.mozilla.org/en/docs/Web/API/Blob][Blob]] instance
