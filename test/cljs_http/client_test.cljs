@@ -251,8 +251,8 @@
           timeout-req (client/get "http://httpbin.org/delay/10" {:timeout 1})]
       (async done
         (go
-          (is (= :no-error (:error-code (<! success-req))))
-          (is (= :timeout  (:error-code (<! timeout-req))))
+          (is (= :no-error (:error-code (async/<! success-req))))
+          (is (= :timeout  (:error-code (async/<! timeout-req))))
           (done))))))
 
 (deftest ^:async response-type
