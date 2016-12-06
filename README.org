@@ -106,6 +106,14 @@
       (http/get "http://example.com" {:basic-auth {:username "hello" :password "world"}})
     #+END_SRC
 
+*** Custom Headers (Authorization)
+
+    #+BEGIN_SRC clojure
+    (http/post "https://example.com" 
+               {:with-credentials? false
+                :headers {"Authorization" "SuperSecretToken"}})
+    #+END_SRC
+
 *** Upload/Download progress monitoring
 
     #+BEGIN_SRC clojure
