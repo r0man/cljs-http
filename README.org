@@ -106,10 +106,17 @@
       (http/get "http://example.com" {:basic-auth {:username "hello" :password "world"}})
     #+END_SRC
 
+*** OAuth 2.0 Bearer Token
+
+    #+BEGIN_SRC clojure
+      (http/get "http://example.com" {:with-credentials? false
+                                      :oauth-token "SecretBearerToken"})
+    #+END_SRC
+
 *** Custom Headers (Authorization)
 
     #+BEGIN_SRC clojure
-    (http/post "https://example.com" 
+    (http/post "https://example.com"
                {:with-credentials? false
                 :headers {"Authorization" "SuperSecretToken"}})
     #+END_SRC
