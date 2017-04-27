@@ -6,7 +6,7 @@
   :dependencies [[noencore "0.3.3"]
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229" :scope "provided"]
-                 [org.clojure/core.async "0.2.391"]
+                 [org.clojure/core.async "0.3.442"]
                  [com.cognitect/transit-cljs "0.8.239"]]
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-doo "0.1.7"]]
