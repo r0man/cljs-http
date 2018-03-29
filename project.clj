@@ -11,6 +11,7 @@
                  [com.cognitect/transit-cljs "0.8.239"]]
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-doo "0.1.9"]]
+  :doo {:paths {:karma "node_modules/.bin/karma"}}
   :aliases {"test" ["do"
                     ["clean"]
                     ["doo" "chrome-headless" "none" "once"]
