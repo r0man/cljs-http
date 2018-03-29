@@ -7,13 +7,14 @@
                  [org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229" :scope "provided"]
                  [org.clojure/core.async "0.3.442"]
+                 [org.clojure/tools.namespace "0.2.11"]
                  [com.cognitect/transit-cljs "0.8.239"]]
   :plugins [[lein-cljsbuild "1.1.4"]
-            [lein-doo "0.1.7"]]
+            [lein-doo "0.1.9"]]
   :aliases {"test" ["do"
                     ["clean"]
-                    ["doo" "phantom" "none" "once"]
-                    ["doo" "phantom" "advanced" "once"]]}
+                    ["doo" "chrome-headless" "none" "once"]
+                    ["doo" "chrome-headless" "advanced" "once"]]}
   :cljsbuild {:builds
               [{:id "none"
                 :compiler
@@ -34,4 +35,4 @@
                 :source-paths ["src" "test"]}]}
   :deploy-repositories [["releases" :clojars]]
   :min-lein-version "2.0.0"
-  :profiles {:dev {:dependencies [[doo "0.1.7"]]}})
+  :profiles {:dev {:dependencies [[doo "0.1.9"]]}})
