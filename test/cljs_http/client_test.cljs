@@ -10,7 +10,14 @@
   (is (nil? (client/parse-query-params nil)))
   (is (nil? (client/parse-query-params "")))
   (is (= {:a "1"} (client/parse-query-params "a=1")))
-  (is (= {:a "1" :b "2"} (client/parse-query-params "a=1&b=2"))))
+  (is (= {:a "1" :b "2"} (client/parse-query-params "a=1&b=2")))
+  (is (= {:a ["1" "2"]} (client/parse-query-params "a=1&a=2"))))
+
+(deftest test-generate-query-string
+  (is (= (client/generate-query-string {}) ""))
+  (is (= (client/generate-query-string {:a 1}) "a=1"))
+  (is (= (client/generate-query-string (sort {:a 1 :b 2})) "a=1&b=2"))
+  (is (= (client/generate-query-string {:a [1 2]}) "a=1&a=2")))
 
 (deftest test-parse-url
   (is (nil? (client/parse-url nil)))

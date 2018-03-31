@@ -12,14 +12,21 @@
 (defn if-pos [v]
   (if (and v (pos? v)) v))
 
+(defn- acc-param [o v]
+  (cond
+    (coll? o) (conj o v)
+    (some? o) [o v]
+    :else     v))
+
 (defn parse-query-params
   "Parse `s` as query params and return a hash map."
   [s]
   (if-not (blank? s)
     (reduce
      #(let [[k v] (split %2 #"=")]
-        (assoc %1
+        (update %1
           (keyword (url-decode k))
+          acc-param
           (url-decode v)))
      {} (split (str s) #"&"))))
 
