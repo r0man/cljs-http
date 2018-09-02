@@ -110,6 +110,16 @@
     (-> #(decode-body % read-string "application/edn" (:request-method request))
         (async/map [(client request)]))))
 
+(defn wrap-header-params
+  [client]
+  (fn [request]
+    (if-let [params (:header-params request)]
+      (let [headers (merge (reduce-kv (fn [h k v] (assoc h (name k) (str v))) {} params) (:headers request))]
+        (-> (dissoc request :header-params)
+            (assoc :headers headers)
+            (client)))
+      (client request))))
+
 (defn wrap-default-headers
   [client & [default-headers]]
   (fn [request]
@@ -232,6 +242,19 @@
 (defn wrap-server-name [client server-name]
   #(client (assoc %1 :server-name server-name)))
 
+(defn wrap-path-params
+  "Rewrite the URL replacing path parameters of the form '/{param-1}/{param-2}'."
+  [client]
+  (fn [request]
+    (if-let [params (:path-params request)]
+      (let [uri (reduce-kv (fn [uri k v]
+                             (clojure.string/replace uri (re-pattern (str "{" (name k) "}")) v)) (:uri request)
+                           params)]
+        (-> (dissoc request :path-params)
+            (assoc :uri uri)
+            (client)))
+      (client request))))
+
 (defn wrap-url [client]
   (fn [{:keys [query-params] :as req}]
     (if-let [spec (parse-url (:url req))]
@@ -289,8 +312,10 @@
       wrap-basic-auth
       wrap-oauth
       wrap-method
+      wrap-path-params
       wrap-url
       wrap-channel-from-request-map
+      wrap-header-params
       wrap-default-headers))
 
 (def #^{:doc

@@ -118,6 +118,21 @@
         (is (= {:a "1" :b "2"} (:query-params request)))))
      request)))
 
+(deftest test-wrap-path-params
+  (let [request {:request-method :get :url "http://example.com" :uri "/{a}/{b}" :path-params {:a "1" :b "2"}}]
+    ((client/wrap-path-params
+       (fn [request]
+         (is (= "/1/2" (:uri request)))))
+      request)))
+
+(deftest test-wrap-header-params
+  (let [request {:request-method :get :url "http://example.com/" :header-params {:a "1" :b "2"}}]
+    ((client/wrap-header-params
+       (fn [request]
+         (is (= "1" (get-in request [:headers "a"])))
+         (is (= "2" (get-in request [:headers "b"])))))
+      request)))
+
 (deftest test-wrap-form-params
   (testing "With form params"
     (let [request {:request-method :post :form-params (sorted-map :param1 "value1" :param2 "value2")}
