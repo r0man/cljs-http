@@ -1,4 +1,5 @@
 (ns cljs-http.util
+  (:refer-clojure :exclude [uri?])
   (:import goog.Uri)
   (:require [clojure.string :refer [blank? capitalize join split lower-case]]
             [cognitect.transit :as t]
