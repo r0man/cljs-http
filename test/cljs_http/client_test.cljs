@@ -2,9 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :as async]
             [cljs-http.client :as client]
-            [cljs-http.core :as core]
             [cljs-http.util :as util]
-            [cljs.test :refer-macros [async are is deftest testing]]))
+            [cljs.test :refer-macros [async is deftest testing]]))
 
 (deftest test-parse-query-params
   (is (nil? (client/parse-query-params nil)))
