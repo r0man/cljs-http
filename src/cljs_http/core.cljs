@@ -1,10 +1,9 @@
 (ns cljs-http.core
-  (:import [goog.net EventType ErrorCode XhrIo]
+  (:import [goog.net EventType XhrIo]
            [goog.net Jsonp])
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs-http.util :as util]
-            [cljs.core.async :as async]
-            [clojure.string :as s]))
+            [cljs.core.async :as async]))
 
 (def pending-requests (atom {}))
 
@@ -72,7 +71,7 @@
 (defn xhr
   "Execute the HTTP request corresponding to the given Ring request
   map and return a core.async channel."
-  [{:keys [request-method headers body with-credentials? cancel progress] :as request}]
+  [{:keys [request-method headers body cancel progress] :as request}]
   (let [channel (async/chan)
         request-url (util/build-url request)
         method (name (or request-method :get))
@@ -92,24 +91,24 @@
                  (if-not (aborted? xhr)
                    (async/put! channel response))
                  (swap! pending-requests dissoc channel)
-                 (if cancel (async/close! cancel))
+                 (when cancel (async/close! cancel))
                  (async/close! channel))))
 
     (when progress
       (let [listener (fn [direction evt]
                        (async/put! progress (merge {:direction direction :loaded (.-loaded evt)}
-                                                   (if (.-lengthComputable evt) {:total (.-total evt)}))))]
+                                                   (when (.-lengthComputable evt) {:total (.-total evt)}))))]
         (doto xhr
           (.setProgressEventsEnabled true)
           (.listen EventType.UPLOAD_PROGRESS (partial listener :upload))
           (.listen EventType.DOWNLOAD_PROGRESS (partial listener :download)))))
 
     (.send xhr request-url method body headers)
-    (if cancel
+    (when cancel
       (go
-        (let [v (async/<! cancel)]
-          (if (not (.isComplete xhr))
-            (.abort xhr)))))
+        (async/<! cancel)
+        (when (not (.isComplete xhr))
+          (.abort xhr))))
     channel))
 
 (defn jsonp
@@ -128,17 +127,17 @@
                                        :body (js->clj data :keywordize-keys keywordize-keys?)}]
                          (async/put! channel response)
                          (swap! pending-requests dissoc channel)
-                         (if cancel (async/close! cancel))
+                         (when cancel (async/close! cancel))
                          (async/close! channel)))
                      (fn error-callback []
                          (swap! pending-requests dissoc channel)
-                         (if cancel (async/close! cancel))
+                         (when cancel (async/close! cancel))
                          (async/close! channel)))]
       (swap! pending-requests assoc channel {:jsonp jsonp :request req})
-      (if cancel
+      (when cancel
         (go
-          (let [v (async/<! cancel)]
-            (.cancel jsonp req)))))
+          (async/<! cancel)
+          (.cancel jsonp req))))
     channel))
 
 (defn request

@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [get])
   (:require [cljs-http.core :as core]
             [cljs-http.util :as util]
-            [cljs.core.async :as async :refer [<! chan close! put!]]
+            [cljs.core.async :as async :refer [<!]]
             [cljs.reader :refer [read-string]]
             [clojure.string :refer [blank? join split]]
             [goog.Uri :as uri]
@@ -10,7 +10,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (defn if-pos [v]
-  (if (and v (pos? v)) v))
+  (when (and v (pos? v)) v))
 
 (defn- acc-param [o v]
   (cond

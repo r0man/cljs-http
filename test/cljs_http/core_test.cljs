@@ -1,6 +1,6 @@
 (ns cljs-http.core-test
   (:require [cljs-http.core :as core]
-            [cljs.test :refer-macros [are is deftest testing]]))
+            [cljs.test :refer-macros [is deftest testing]]))
 
 (deftest test-build-xhr
   (testing "default headers are applied on xhr object"

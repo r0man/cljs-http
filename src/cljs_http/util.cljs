@@ -10,7 +10,7 @@
   "Returns the value of the HTTP basic authentication header for
   `credentials`."
   [credentials]
-  (if credentials
+  (when credentials
     (let [[username password]
           (if (map? credentials)
             (map credentials [:username :password])
