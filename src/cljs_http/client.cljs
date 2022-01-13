@@ -295,7 +295,7 @@
 
 (def #^{:doc
         "Executes the HTTP request corresponding to the given map and returns the
-   response map for corresponding to the resulting HTTP response.
+   response map corresponding to the resulting HTTP response.
 
    In addition to the standard Ring request keys, the following keys are also
    recognized:
