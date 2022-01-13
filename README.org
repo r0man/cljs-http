@@ -47,7 +47,7 @@
 
 *** Content type
 
-    /cljs-http/ can serializes the body of a request and set the
+    /cljs-http/ can serialize the body of a request and set the
     /Content-Type/ header accordingly. You can send the body params in
     mutiple formats:
 
