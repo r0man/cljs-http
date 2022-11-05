@@ -1,6 +1,6 @@
 * cljs-http
 
-  [[https://clojars.org/org.clojars.ruffnext/cljs-http][https://img.shields.io/clojars/v/cljs-http.svg]]
+  [[https://clojars.org/org.clojars.ruffnext/cljs-http][https://img.shields.io/clojars/v/org.clojars.ruffnext/cljs-http.svg]]
   [[https://travis-ci.org/r0man/cljs-http][https://travis-ci.org/r0man/cljs-http.svg]]
 
   A HTTP library for [[https://github.com/clojure/clojurescript][ClojureScript]].
