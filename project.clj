@@ -1,6 +1,6 @@
-(defproject cljs-http "0.1.47-SNAPSHOT"
+(defproject org.clojars.ruffnext/cljs-http "0.1.47"
   :description "A ClojureScript HTTP library."
-  :url "https://github.com/r0man/cljs-http"
+  :url "https://github.com/ruffnext/cljs-http"
   :license {:name "Eclipse Public License"
             :url "https://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[noencore "0.3.7"]

@@ -1,11 +1,11 @@
 * cljs-http
 
-  [[https://clojars.org/cljs-http][https://img.shields.io/clojars/v/cljs-http.svg]]
+  [[https://clojars.org/org.clojars.ruffnext/cljs-http][https://img.shields.io/clojars/v/cljs-http.svg]]
   [[https://travis-ci.org/r0man/cljs-http][https://travis-ci.org/r0man/cljs-http.svg]]
-  [[http://jarkeeper.com/r0man/cljs-http][http://jarkeeper.com/r0man/cljs-http/status.svg]]
-  [[http://jarkeeper.com/r0man/cljs-http][https://jarkeeper.com/r0man/cljs-http/downloads.svg]]
 
   A HTTP library for [[https://github.com/clojure/clojurescript][ClojureScript]].
+
+  THIS IS A FORK OF [[https://github.com/r0man/cljs-http][r0man/cljs-http]].
 
   [[https://xkcd.com/869/][http://imgs.xkcd.com/comics/server_attention_span.png]]
 
