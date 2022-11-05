@@ -20,3 +20,7 @@
 /pom.xml.asc
 /.repl
 /.nrepl-port
+.clj-kondo
+.lsp
+node_modules
+yarn.lock
