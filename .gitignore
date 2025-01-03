@@ -22,3 +22,8 @@
 /.nrepl-port
 .clj-kondo
 .lsp
+
+# node
+package-lock.json
+node_modules
+yarn.lock
