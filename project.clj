@@ -9,8 +9,8 @@
                  [org.clojure/core.async "1.8.741"]
                  [org.clojure/tools.namespace "1.5.0"]
                  [com.cognitect/transit-cljs "0.8.280"]]
-  :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-doo "0.1.10"]]
+  :plugins [[lein-cljsbuild "1.1.8"]
+            [lein-doo "0.1.11"]]
   :doo {:paths {:karma "node_modules/.bin/karma"}}
   :aliases {"test" ["do"
                     ["clean"]
