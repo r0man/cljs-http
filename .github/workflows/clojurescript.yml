@@ -25,4 +25,5 @@ jobs:
           key: deps-${{ hashFiles('project.clj') }}
           restore-keys: deps-
       - run: npm install
+      - run: lein doo chrome-headless none once
       - run: lein doo chrome-headless advanced once
