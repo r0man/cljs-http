@@ -24,4 +24,5 @@ jobs:
           path: ~/.m2/repository
           key: deps-${{ hashFiles('project.clj') }}
           restore-keys: deps-
+      - run: npm install
       - run: lein doo chrome-headless advanced once
