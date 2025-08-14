@@ -168,7 +168,7 @@
 ;; for JSONP tests
 (deftest ^:async test-cancel-jsonp-channel
   (let [cancel (async/chan 1)
-        request (client/request {:request-method :jsonp :url "http://jsfiddle.net/echo/jsonp/" :cancel cancel})]
+        request (client/request {:request-method :jsonp :url "https://jsfiddle.net/echo/jsonp/" :cancel cancel})]
     (async/close! cancel)
     (testing "output channel is closed if request is cancelled"
       (async done
@@ -178,7 +178,7 @@
           (done))))))
 
 (deftest ^:async test-jsonp
-  (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
+  (let [request (client/jsonp "https://jsfiddle.net/echo/jsonp/"
                               {:query-params {:foo "bar"}
                                :channel (async/chan 1 (map :body))})]
     (testing "jsonp request"
@@ -189,7 +189,7 @@
           (done))))))
 
 (deftest ^:async test-keywordize-jsonp
-  (let [request (client/jsonp "http://jsfiddle.net/echo/jsonp/"
+  (let [request (client/jsonp "https://jsfiddle.net/echo/jsonp/"
                               {:keywordize-keys? false
                                :query-params {:foo ""}
                                :channel (async/chan 1 (map :body))})]
